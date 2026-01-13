@@ -12,7 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 "columns_type": { "numerical": 6, "categorical": 9 },
                 "usage": ["DiffuTabGen", "TabSYN", "TabDiff", "TabDDPM"],
                 "class_imbalance_ratio": "0.31 (Positive: ~24%)",
-                "sparsity": "~7% rows have '?' (Missing Values)"
+                "sparsity": "~7% rows have '?' (Missing Values)",
+                "difficulty": {
+                    "single_constraint": { "level": "Medium", "score": 5, "reason": "Moderate imbalance. Missing values add noise. Many categorical columns make encoding harder." },
+                    "double_constraint": { "level": "Hard", "score": 7, "reason": "Correlations between features (e.g., education & income) can conflict with arbitrary double constraints." }
+                }
             },
             {
                 "id": "default",
@@ -23,18 +27,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 "columns_type": { "numerical": 14, "categorical": 10 },
                 "usage": ["DiffuTabGen", "TabSYN", "ResNet"],
                 "class_imbalance_ratio": "0.28 (Positive: ~22%)",
-                "sparsity": "0% (Dense)"
+                "sparsity": "0% (Dense)",
+                "difficulty": {
+                    "single_constraint": { "level": "Medium", "score": 5, "reason": "Imbalanced target. Financial data has heavy tails and outliers." },
+                    "double_constraint": { "level": "Hard", "score": 8, "reason": "Strong inter-column dependencies (payment history, balance). Conflicting constraints are common." }
+                }
             },
             {
                 "id": "shoppers",
                 "name": "Online Shoppers Purchasing Intention",
-                "description": "Dataset consists of feature vectors belonging to 12,330 sessions. The dataset was formed so that each session would belong to a different user in a 1-year period to avoid any tendency to a specific campaign, special day, user profile, or period.",
+                "description": "Dataset consists of feature vectors belonging to 12,330 sessions. The dataset was formed so that each session would belong to a different user in a 1-year period.",
                 "origin": "UCI Machine Learning Repository",
                 "stats": { "rows": 12330, "cols": 18, "task": "Binary Classification", "imbalance": "~15.5% Revenue (Positive)" },
                 "columns_type": { "numerical": 10, "categorical": 8 },
                 "usage": ["DiffuTabGen", "TabSYN"],
                 "class_imbalance_ratio": "0.18 (Positive: ~15.5%)",
-                "sparsity": "0% (Dense)"
+                "sparsity": "0% (Dense)",
+                "difficulty": {
+                    "single_constraint": { "level": "Hard", "score": 7, "reason": "Highly imbalanced (~15% positive). Generating minority class samples requires tail generation." },
+                    "double_constraint": { "level": "Very Hard", "score": 9, "reason": "Severe imbalance + temporal/behavioral features. Double constraints on rare events are extremely difficult." }
+                }
             },
             {
                 "id": "german",
@@ -45,18 +57,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 "columns_type": { "numerical": 7, "categorical": 14 },
                 "usage": ["DiffuTabGen", "TabSYN", "TVAE"],
                 "class_imbalance_ratio": "0.42 (Positive: 30%)",
-                "sparsity": "0% (Dense)"
+                "sparsity": "0% (Dense)",
+                "difficulty": {
+                    "single_constraint": { "level": "Easy", "score": 3, "reason": "Small dataset, moderate imbalance. Easy to learn distribution." },
+                    "double_constraint": { "level": "Medium", "score": 5, "reason": "Small sample size limits learning complex joint distributions for multiple constraints." }
+                }
             },
             {
                 "id": "dropout",
                 "name": "Predict Students' Dropout and Academic Success",
-                "description": "A dataset created from a higher education institution (acquired from several disjoint databases) related to students enrolled in different undergraduate degrees.",
+                "description": "A dataset from a higher education institution related to students enrolled in different undergraduate degrees.",
                 "origin": "UCI Machine Learning Repository",
                 "stats": { "rows": 4424, "cols": 37, "task": "Classification (Dropout/Enrolled/Graduate)", "imbalance": "Balanced" },
                 "columns_type": { "numerical": "Mixed", "categorical": "Mixed" },
                 "usage": ["DiffuTabGen", "TabSYN"],
                 "class_imbalance_ratio": "1.0 (Balanced)",
-                "sparsity": "0% (Dense)"
+                "sparsity": "0% (Dense)",
+                "difficulty": {
+                    "single_constraint": { "level": "Medium", "score": 5, "reason": "Balanced but high-dimensional (37 cols). Many features increase complexity." },
+                    "double_constraint": { "level": "Hard", "score": 7, "reason": "Multi-class target. High dimensionality makes joint constraint satisfaction harder." }
+                }
             },
             {
                 "id": "magic",
@@ -67,7 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 "columns_type": { "numerical": 10, "categorical": 1 },
                 "usage": ["TabSYN"],
                 "class_imbalance_ratio": "0.54 (Positive: ~35%)",
-                "sparsity": "0% (Dense)"
+                "sparsity": "0% (Dense)",
+                "difficulty": {
+                    "single_constraint": { "level": "Easy", "score": 2, "reason": "Mostly numerical. Low dimensionality. Clean MC-generated data." },
+                    "double_constraint": { "level": "Easy", "score": 3, "reason": "Simple structure. Numerical features have smooth distributions. Few conflicts." }
+                }
             },
             {
                 "id": "cardio",
@@ -78,7 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 "columns_type": { "numerical": "Mixed", "categorical": "Mixed" },
                 "usage": ["DiffuTabGen (Plausibility Experiments)"],
                 "class_imbalance_ratio": "1.0 (Balanced)",
-                "sparsity": "0% (Dense)"
+                "sparsity": "0% (Dense)",
+                "difficulty": {
+                    "single_constraint": { "level": "Very Easy", "score": 1, "reason": "Balanced, large dataset, low dimensionality. Ideal for diffusion models." },
+                    "double_constraint": { "level": "Easy", "score": 2, "reason": "Large sample size and balanced classes make joint constraints easier to satisfy." }
+                }
             },
             {
                 "id": "beijing",
@@ -89,7 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 "columns_type": { "numerical": 9, "categorical": 4 },
                 "usage": ["TabSYN"],
                 "class_imbalance_ratio": "N/A",
-                "sparsity": "~4% Missing Values"
+                "sparsity": "~4% Missing Values",
+                "difficulty": {
+                    "single_constraint": { "level": "Medium", "score": 4, "reason": "Regression target. Time-series dependencies. Some missing values." },
+                    "double_constraint": { "level": "Medium", "score": 5, "reason": "Temporal correlations can conflict with arbitrary constraints on weather features." }
+                }
             },
             {
                 "id": "news",
@@ -100,7 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 "columns_type": { "numerical": 58, "categorical": 3 },
                 "usage": ["TabSYN"],
                 "class_imbalance_ratio": "N/A",
-                "sparsity": "0% (Dense)"
+                "sparsity": "0% (Dense)",
+                "difficulty": {
+                    "single_constraint": { "level": "Hard", "score": 6, "reason": "Very high dimensionality (61 cols). Regression target with heavy-tailed distribution (viral articles)." },
+                    "double_constraint": { "level": "Very Hard", "score": 9, "reason": "High dimensionality + heavy-tailed target. Extremely difficult to satisfy constraints on popularity metrics." }
+                }
             }
         ],
         "insights": {
@@ -117,6 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     "metric": "Distribution Tails",
                     "impact": "When the target mean is at the extreme ends of the distribution, guided diffusion struggles to generate accurate samples. Datasets with heavy tails or outliers (like financial data in Loan Default) are harder to model accurately."
+                },
+                {
+                    "metric": "Single vs. Double Constraints",
+                    "impact": "Single constraints only require shifting one marginal distribution. Double constraints require satisfying a joint condition, which can conflict with learned correlations. For example, constraining both 'high education' AND 'low income' on Adult is harder than either alone because they are negatively correlated in the training data."
                 }
             ]
         },
@@ -209,15 +249,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === modal.el) closeModal();
     });
 
+    // Helper: Difficulty badge color
+    function getDifficultyColor(level) {
+        const colors = {
+            'Very Easy': '#10b981',
+            'Easy': '#22c55e',
+            'Medium': '#f59e0b',
+            'Hard': '#ef4444',
+            'Very Hard': '#dc2626'
+        };
+        return colors[level] || '#888';
+    }
+
     // Render Logic
     function renderDatasets(datasets) {
         if (!grids.datasets) return;
-        grids.datasets.innerHTML = datasets.map(d => `
+        grids.datasets.innerHTML = datasets.map(d => {
+            const singleDiff = d.difficulty?.single_constraint;
+            const doubleDiff = d.difficulty?.double_constraint;
+            return `
             <div class="dataset-card" onclick="window.showDatasetDetail('${d.id}')">
                 <span class="badge">${d.stats.task}</span>
                 <h3>${d.name}</h3>
                 <p style="color:var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
-                    ${d.description.substring(0, 100)}...
+                    ${d.description.substring(0, 80)}...
                 </p>
                 <div class="stat-row">
                     <div class="stat-item">
@@ -228,17 +283,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span>${d.stats.cols}</span>
                         Cols
                     </div>
-                     <div class="stat-item">
-                        <span>${d.columns_type ? d.columns_type.numerical : '?'}</span>
-                        Num
-                    </div>
-                     <div class="stat-item">
-                        <span>${d.columns_type ? d.columns_type.categorical : '?'}</span>
-                        Cat
-                    </div>
                 </div>
+                ${singleDiff ? `
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="background: ${getDifficultyColor(singleDiff.level)}22; color: ${getDifficultyColor(singleDiff.level)}; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; border: 1px solid ${getDifficultyColor(singleDiff.level)}44;">
+                        1-Constraint: ${singleDiff.level}
+                    </span>
+                    <span style="background: ${getDifficultyColor(doubleDiff.level)}22; color: ${getDifficultyColor(doubleDiff.level)}; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; border: 1px solid ${getDifficultyColor(doubleDiff.level)}44;">
+                        2-Constraint: ${doubleDiff.level}
+                    </span>
+                </div>
+                ` : ''}
             </div>
-        `).join('');
+        `}).join('');
     }
 
     function renderPapers(papers) {
@@ -272,6 +329,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderAnalysis(insights) {
         if (!grids.analysis || !insights) return;
+
+        // Sort datasets by difficulty for the ranking table
+        const sortedSingle = [...appData.datasets].filter(d => d.difficulty).sort((a, b) => a.difficulty.single_constraint.score - b.difficulty.single_constraint.score);
+        const sortedDouble = [...appData.datasets].filter(d => d.difficulty).sort((a, b) => a.difficulty.double_constraint.score - b.difficulty.double_constraint.score);
+
         grids.analysis.innerHTML = `
             <div class="paper-card">
                 <h2 style="margin-bottom:1.5rem;">${insights.title}</h2>
@@ -282,6 +344,50 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p style="color:var(--text-secondary); line-height:1.6;">${i.impact}</p>
                         </div>
                     `).join('')}
+                </div>
+            </div>
+
+            <div class="paper-card" style="margin-top: 2rem;">
+                <h2 style="margin-bottom:1.5rem;">Dataset Difficulty Rankings</h2>
+                <p style="color:var(--text-secondary); margin-bottom: 1.5rem;">
+                    Datasets ranked from easiest to hardest for synthetic data generation with constraints.
+                </p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Single Constraint</h3>
+                        <table class="results-table">
+                            <thead>
+                                <tr><th>Rank</th><th>Dataset</th><th>Difficulty</th></tr>
+                            </thead>
+                            <tbody>
+                                ${sortedSingle.map((d, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${d.name}</td>
+                                        <td style="color: ${getDifficultyColor(d.difficulty.single_constraint.level)}">${d.difficulty.single_constraint.level}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--accent-primary); margin-bottom: 1rem;">Double Constraint</h3>
+                        <table class="results-table">
+                            <thead>
+                                <tr><th>Rank</th><th>Dataset</th><th>Difficulty</th></tr>
+                            </thead>
+                            <tbody>
+                                ${sortedDouble.map((d, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${d.name}</td>
+                                        <td style="color: ${getDifficultyColor(d.difficulty.double_constraint.level)}">${d.difficulty.double_constraint.level}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         `;
@@ -299,7 +405,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return (aIdx === -1 ? 100 : aIdx) - (bIdx === -1 ? 100 : bIdx);
         });
 
-        tbody.innerHTML = sorted.map(d => `
+        tbody.innerHTML = sorted.map(d => {
+            const singleDiff = d.difficulty?.single_constraint;
+            const doubleDiff = d.difficulty?.double_constraint;
+            return `
             <tr>
                 <td style="font-weight:bold; color:var(--accent-primary);">${d.name}</td>
                 <td>${d.stats.task}</td>
@@ -307,11 +416,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${d.stats.cols}</td>
                 <td>${d.columns_type ? d.columns_type.numerical : '-'}</td>
                 <td>${d.columns_type ? d.columns_type.categorical : '-'}</td>
+                <td style="color: ${singleDiff ? getDifficultyColor(singleDiff.level) : '#888'}">${singleDiff ? singleDiff.level : '-'}</td>
+                <td style="color: ${doubleDiff ? getDifficultyColor(doubleDiff.level) : '#888'}">${doubleDiff ? doubleDiff.level : '-'}</td>
             </tr>
-        `).join('');
+        `}).join('');
     }
 
-    // Initialize with inline data (no fetch needed)
+    // Initialize with inline data
     renderDatasets(appData.datasets);
     renderSummaryTable(appData.datasets);
     renderPapers(appData.papers);
@@ -321,6 +432,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showDatasetDetail = function (id) {
         const d = appData.datasets.find(x => x.id === id);
         if (!d) return;
+
+        const singleDiff = d.difficulty?.single_constraint;
+        const doubleDiff = d.difficulty?.double_constraint;
 
         const html = `
             <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">${d.name}</h2>
@@ -365,6 +479,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="font-size:0.8rem; opacity:0.7;">Cat. Feats</div>
                 </div>
             </div>
+
+            ${singleDiff ? `
+            <span class="detail-label" style="margin-top: 2rem;">Generation Difficulty</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                <div style="background: ${getDifficultyColor(singleDiff.level)}15; padding: 1rem; border-radius: 10px; border: 1px solid ${getDifficultyColor(singleDiff.level)}33;">
+                    <div style="font-weight: bold; color: ${getDifficultyColor(singleDiff.level)}; margin-bottom: 0.5rem;">Single Constraint: ${singleDiff.level}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">${singleDiff.reason}</div>
+                </div>
+                <div style="background: ${getDifficultyColor(doubleDiff.level)}15; padding: 1rem; border-radius: 10px; border: 1px solid ${getDifficultyColor(doubleDiff.level)}33;">
+                    <div style="font-weight: bold; color: ${getDifficultyColor(doubleDiff.level)}; margin-bottom: 0.5rem;">Double Constraint: ${doubleDiff.level}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">${doubleDiff.reason}</div>
+                </div>
+            </div>
+            ` : ''}
 
             <span class="detail-label">Used In Papers</span>
             <div class="detail-list">

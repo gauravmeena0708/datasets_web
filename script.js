@@ -132,12 +132,37 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    function renderSummaryTable(datasets) {
+        const tbody = document.getElementById('summary-table-body');
+        if (!tbody) return;
+
+        // Filter to show interesting datasets or all? Let's show all for now.
+        // Or prioritize the ones in the user's list: Adult, Default, Shoppers, Magic, Beijing, News
+        const priorityOrder = ['adult', 'default', 'shoppers', 'magic', 'beijing', 'news', 'german', 'cardio', 'dropout'];
+
+        const sorted = [...datasets].sort((a, b) => {
+            return priorityOrder.indexOf(a.id) - priorityOrder.indexOf(b.id);
+        });
+
+        tbody.innerHTML = sorted.map(d => `
+            <tr>
+                <td style="font-weight:bold; color:var(--accent-primary);">${d.name}</td>
+                <td>${d.stats.task}</td>
+                <td>${d.stats.rows.toLocaleString()}</td>
+                <td>${d.stats.cols}</td>
+                <td>${d.columns_type ? d.columns_type.numerical : '-'}</td>
+                <td>${d.columns_type ? d.columns_type.categorical : '-'}</td>
+            </tr>
+        `).join('');
+    }
+
     // Initialize
     fetch('data.json')
         .then(res => res.json())
         .then(data => {
             appData = data;
             renderDatasets(data.datasets);
+            renderSummaryTable(data.datasets); // New call
             renderPapers(data.papers);
             renderAnalysis(data.insights);
         })

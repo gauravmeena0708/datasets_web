@@ -158,6 +158,48 @@
       ],
       "class_imbalance_ratio": "1.0 (Balanced)",
       "sparsity": "0% (Dense)"
+    },
+    {
+      "id": "beijing",
+      "name": "Beijing PM2.5",
+      "description": "Hourly PM2.5 data from US Embassy in Beijing. Used to predict pollution levels.",
+      "origin": "UCI Machine Learning Repository",
+      "stats": {
+        "rows": 43824,
+        "cols": 13,
+        "task": "Regression",
+        "imbalance": "N/A (Regression)"
+      },
+      "columns_type": {
+        "numerical": 9,
+        "categorical": 4
+      },
+      "usage": [
+        "TabSYN"
+      ],
+      "class_imbalance_ratio": "N/A",
+      "sparsity": "~4% Missing Values"
+    },
+    {
+      "id": "news",
+      "name": "Online News Popularity",
+      "description": "Articles published by Mashable. Predicts the number of shares in social networks.",
+      "origin": "UCI Machine Learning Repository",
+      "stats": {
+        "rows": 39644,
+        "cols": 61,
+        "task": "Regression",
+        "imbalance": "N/A (Regression)"
+      },
+      "columns_type": {
+        "numerical": 58,
+        "categorical": 3
+      },
+      "usage": [
+        "TabSYN"
+      ],
+      "class_imbalance_ratio": "N/A",
+      "sparsity": "0% (Dense)"
     }
   ],
   "insights": {

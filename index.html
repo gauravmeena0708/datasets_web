@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Dataset Explorer | TabDiffuGen</title>
     <meta charset="UTF-8">
@@ -9,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="background-globes">
         <div class="globe globe-1"></div>
@@ -20,6 +22,7 @@
         <nav>
             <button id="btn-datasets" class="nav-btn active">Datasets</button>
             <button id="btn-papers" class="nav-btn">Papers & Results</button>
+            <button id="btn-analysis" class="nav-btn">Analysis</button>
         </nav>
     </header>
 
@@ -30,7 +33,7 @@
                 <h1>Explore <span class="gradient-text">High-Dimensional</span> Tabular Datasets</h1>
                 <p>Comprehensive metadata, statistics, and benchmarks for modern synthetic data generation research.</p>
             </div>
-            
+
             <div id="dataset-grid" class="card-grid">
                 <!-- Cards injected by JS -->
             </div>
@@ -43,7 +46,18 @@
                 <p>Track performance metrics across state-of-the-art generative models.</p>
             </div>
             <div id="papers-list" class="wide-list">
-                 <!-- Papers injected by JS -->
+                <!-- Papers injected by JS -->
+            </div>
+        </section>
+
+        <!-- Analysis View -->
+        <section id="analysis-view" class="view hidden-view">
+            <div class="hero">
+                <h1>Performance <span class="gradient-text">Insights</span></h1>
+                <p>Understanding why synthetic data fidelity varies across datasets.</p>
+            </div>
+            <div id="analysis-content" class="wide-list">
+                <!-- Insights injected by JS -->
             </div>
         </section>
     </main>
@@ -58,4 +72,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

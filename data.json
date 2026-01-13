@@ -18,7 +18,14 @@
         "numerical": 6,
         "categorical": 9
       },
-      "usage": ["DiffuTabGen", "TabSYN", "TabDiff", "TabDDPM"]
+      "usage": [
+        "DiffuTabGen",
+        "TabSYN",
+        "TabDiff",
+        "TabDDPM"
+      ],
+      "class_imbalance_ratio": "0.31 (Positive: ~24%)",
+      "sparsity": "~7% rows have '?' (Missing Values)"
     },
     {
       "id": "default",
@@ -31,11 +38,17 @@
         "task": "Binary Classification",
         "imbalance": "~22% Default"
       },
-       "columns_type": {
+      "columns_type": {
         "numerical": 14,
         "categorical": 10
       },
-      "usage": ["DiffuTabGen", "TabSYN", "ResNet"]
+      "usage": [
+        "DiffuTabGen",
+        "TabSYN",
+        "ResNet"
+      ],
+      "class_imbalance_ratio": "0.28 (Positive: ~22%)",
+      "sparsity": "0% (Dense)"
     },
     {
       "id": "shoppers",
@@ -52,7 +65,12 @@
         "numerical": 10,
         "categorical": 8
       },
-      "usage": ["DiffuTabGen", "TabSYN"]
+      "usage": [
+        "DiffuTabGen",
+        "TabSYN"
+      ],
+      "class_imbalance_ratio": "0.18 (Positive: ~15.5%)",
+      "sparsity": "0% (Dense)"
     },
     {
       "id": "german",
@@ -69,7 +87,13 @@
         "numerical": 7,
         "categorical": 14
       },
-      "usage": ["DiffuTabGen", "TabSYN", "TVAE"]
+      "usage": [
+        "DiffuTabGen",
+        "TabSYN",
+        "TVAE"
+      ],
+      "class_imbalance_ratio": "0.42 (Positive: 30%)",
+      "sparsity": "0% (Dense)"
     },
     {
       "id": "dropout",
@@ -82,11 +106,16 @@
         "task": "Classification (Dropout/Enrolled/Graduate)",
         "imbalance": "Balanced"
       },
-       "columns_type": {
+      "columns_type": {
         "numerical": "Mixed",
         "categorical": "Mixed"
       },
-      "usage": ["DiffuTabGen", "TabSYN"]
+      "usage": [
+        "DiffuTabGen",
+        "TabSYN"
+      ],
+      "class_imbalance_ratio": "1.0 (Balanced)",
+      "sparsity": "0% (Dense)"
     },
     {
       "id": "magic",
@@ -103,7 +132,11 @@
         "numerical": 10,
         "categorical": 1
       },
-      "usage": ["DiffuTabGen (Plausibility Experiments)"]
+      "usage": [
+        "DiffuTabGen (Plausibility Experiments)"
+      ],
+      "class_imbalance_ratio": "0.54 (Positive: ~35%)",
+      "sparsity": "0% (Dense)"
     },
     {
       "id": "cardio",
@@ -120,9 +153,30 @@
         "numerical": "Mixed",
         "categorical": "Mixed"
       },
-      "usage": ["DiffuTabGen (Plausibility Experiments)"]
+      "usage": [
+        "DiffuTabGen (Plausibility Experiments)"
+      ],
+      "class_imbalance_ratio": "1.0 (Balanced)",
+      "sparsity": "0% (Dense)"
     }
   ],
+  "insights": {
+    "title": "Why Model Performance Varies",
+    "content": [
+      {
+        "metric": "Class Imbalance",
+        "impact": "Models like GANs tend to suffer from 'mode collapse', ignoring minority classes entirely. Diffusion models (like DiffuTabGen) are more robust but still biased towards the mean. The paper notes: 'when the constraint deviates significantly from the empirical mean... the model continues to generate samples clustered around the original mean.' Highly imbalanced datasets (like default/shoppers) make it harder to generate high-fidelity minority samples."
+      },
+      {
+        "metric": "Sparsity & Cardinality",
+        "impact": "Sparsity (missing values) usually requires imputation which introduces noise. High Cardinality in categorical columns (e.g. Zip Code) is challenging because 'Analog Bit' encoding (used in DiffuTabGen) imposes an artificial geometry/ordering on categories. Complex, high-dimensional discrete manifolds are harder for the diffusion process to learn than continuous dense ones."
+      },
+      {
+        "metric": "Distribution Tails",
+        "impact": "The paper highlights that 'when the target mean is set to a value that lies at the extreme ends (left or right tail)... guided diffusion struggles.' Datasets with heavy tails or outliers (like financial data in Loan Default) are harder to model accurately than normally distributed data."
+      }
+    ]
+  },
   "papers": [
     {
       "id": "diffutabgen",
@@ -147,37 +201,37 @@
           "value": "15.54"
         },
         {
-            "dataset": "loan",
-            "metric": "Constraint Satisfaction (Multi-Controller)",
-            "value": "~95% (Top Constraints)"
+          "dataset": "loan",
+          "metric": "Constraint Satisfaction (Multi-Controller)",
+          "value": "~95% (Top Constraints)"
         },
-         {
-            "dataset": "loan",
-            "metric": "Constraint Satisfaction (Guided - Ours)",
-            "value": "100%"
+        {
+          "dataset": "loan",
+          "metric": "Constraint Satisfaction (Guided - Ours)",
+          "value": "100%"
         }
       ]
     },
-     {
+    {
       "id": "tabsyn",
       "title": "TabSYN: Modeling Tabular Data with Diffusion Models",
       "authors": "Zhang et al.",
       "year": 2024,
       "results": [
         {
-             "dataset": "german",
-             "metric": "Overall Quality Score",
-             "value": "97.57%"
+          "dataset": "german",
+          "metric": "Overall Quality Score",
+          "value": "97.57%"
         },
-         {
-             "dataset": "loan",
-             "metric": "Overall Quality Score",
-             "value": "97.24%"
+        {
+          "dataset": "loan",
+          "metric": "Overall Quality Score",
+          "value": "97.24%"
         },
-         {
-             "dataset": "dropout",
-             "metric": "Overall Quality Score",
-             "value": "75.9%"
+        {
+          "dataset": "dropout",
+          "metric": "Overall Quality Score",
+          "value": "75.9%"
         }
       ]
     }

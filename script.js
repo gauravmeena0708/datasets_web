@@ -3,15 +3,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elements
     const views = {
         datasets: document.getElementById('datasets-view'),
-        papers: document.getElementById('papers-view')
+        papers: document.getElementById('papers-view'),
+        analysis: document.getElementById('analysis-view')
     };
     const navBtns = {
         datasets: document.getElementById('btn-datasets'),
-        papers: document.getElementById('btn-papers')
+        papers: document.getElementById('btn-papers'),
+        analysis: document.getElementById('btn-analysis')
     };
     const grids = {
         datasets: document.getElementById('dataset-grid'),
-        papers: document.getElementById('papers-list')
+        papers: document.getElementById('papers-list'),
+        analysis: document.getElementById('analysis-content')
     };
     const modal = {
         el: document.getElementById('detail-modal'),
@@ -36,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     navBtns.datasets.addEventListener('click', () => switchView('datasets'));
     navBtns.papers.addEventListener('click', () => switchView('papers'));
+    navBtns.analysis.addEventListener('click', () => switchView('analysis'));
 
     // Modal Logic
     function openModal(content) {
@@ -111,6 +115,23 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
+    function renderAnalysis(insights) {
+        if (!insights) return;
+        grids.analysis.innerHTML = `
+            <div class="paper-card">
+                <h2 style="margin-bottom:1.5rem;">${insights.title}</h2>
+                <div style="display:flex; flex-direction:column; gap:2rem;">
+                    ${insights.content.map(i => `
+                        <div style="border-left: 3px solid var(--accent-secondary); padding-left: 1.5rem;">
+                            <h3 style="color:var(--accent-secondary); margin-bottom:0.5rem;">${i.metric}</h3>
+                            <p style="color:var(--text-secondary); line-height:1.6;">${i.impact}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     // Initialize
     fetch('data.json')
         .then(res => res.json())
@@ -118,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             appData = data;
             renderDatasets(data.datasets);
             renderPapers(data.papers);
+            renderAnalysis(data.insights);
         })
         .catch(err => {
             console.error(err);
@@ -144,6 +166,17 @@ document.addEventListener('DOMContentLoaded', () => {
                  <div>
                      <span class="detail-label">Imbalance</span>
                      <div class="detail-value">${d.stats.imbalance}</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                  <div>
+                     <span class="detail-label">Class Ratio</span>
+                     <div class="detail-value">${d.class_imbalance_ratio || 'N/A'}</div>
+                </div>
+                <div>
+                     <span class="detail-label">Sparsity</span>
+                     <div class="detail-value">${d.sparsity || 'N/A'}</div>
                 </div>
             </div>
 

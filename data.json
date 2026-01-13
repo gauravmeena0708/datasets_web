@@ -1,0 +1,185 @@
+{
+  "datasets": [
+    {
+      "id": "adult",
+      "name": "Adult (Census Income)",
+      "description": "Prediction of whether income exceeds $50K/yr based on census data. Also known as 'Census Income' dataset.",
+      "origin": "UCI Machine Learning Repository",
+      "stats": {
+        "rows": 48842,
+        "cols": 15,
+        "train": 32561,
+        "test": 16281,
+        "task": "Binary Classification",
+        "missing_values": "Yes (encoded as ?)",
+        "imbalance": "~24% >50K"
+      },
+      "columns_type": {
+        "numerical": 6,
+        "categorical": 9
+      },
+      "usage": ["DiffuTabGen", "TabSYN", "TabDiff", "TabDDPM"]
+    },
+    {
+      "id": "default",
+      "name": "Loan Default (Default of Credit Card Clients)",
+      "description": "Predict default payment of credit card clients in Taiwan.",
+      "origin": "UCI Machine Learning Repository",
+      "stats": {
+        "rows": 30000,
+        "cols": 24,
+        "task": "Binary Classification",
+        "imbalance": "~22% Default"
+      },
+       "columns_type": {
+        "numerical": 14,
+        "categorical": 10
+      },
+      "usage": ["DiffuTabGen", "TabSYN", "ResNet"]
+    },
+    {
+      "id": "shoppers",
+      "name": "Online Shoppers Purchasing Intention",
+      "description": "Dataset consists of feature vectors belonging to 12,330 sessions. The dataset was formed so that each session would belong to a different user in a 1-year period to avoid any tendency to a specific campaign, special day, user profile, or period.",
+      "origin": "UCI Machine Learning Repository",
+      "stats": {
+        "rows": 12330,
+        "cols": 18,
+        "task": "Binary Classification",
+        "imbalance": "~15.5% Revenue (Positive)"
+      },
+      "columns_type": {
+        "numerical": 10,
+        "categorical": 8
+      },
+      "usage": ["DiffuTabGen", "TabSYN"]
+    },
+    {
+      "id": "german",
+      "name": "German Credit",
+      "description": "Classifies people described by a set of attributes as good or bad credit risks.",
+      "origin": "UCI Machine Learning Repository",
+      "stats": {
+        "rows": 1000,
+        "cols": 21,
+        "task": "Binary Classification",
+        "imbalance": "30% Bad Credit"
+      },
+      "columns_type": {
+        "numerical": 7,
+        "categorical": 14
+      },
+      "usage": ["DiffuTabGen", "TabSYN", "TVAE"]
+    },
+    {
+      "id": "dropout",
+      "name": "Predict Students' Dropout and Academic Success",
+      "description": "A dataset created from a higher education institution (acquired from several disjoint databases) related to students enrolled in different undergraduate degrees, such as agronomy, design, education, nursing, journalism, management, social service, and technologies.",
+      "origin": "UCI Machine Learning Repository",
+      "stats": {
+        "rows": 4424,
+        "cols": 37,
+        "task": "Classification (Dropout/Enrolled/Graduate)",
+        "imbalance": "Balanced"
+      },
+       "columns_type": {
+        "numerical": "Mixed",
+        "categorical": "Mixed"
+      },
+      "usage": ["DiffuTabGen", "TabSYN"]
+    },
+    {
+      "id": "magic",
+      "name": "MAGIC Gamma Telescope",
+      "description": "Data are MC generated to simulate registration of high energy gamma particles in a ground-based atmospheric Cherenkov gamma telescope using the imaging technique.",
+      "origin": "UCI Machine Learning Repository",
+      "stats": {
+        "rows": 19020,
+        "cols": 11,
+        "task": "Binary Classification",
+        "imbalance": "Wildly Imbalanced (Background >> Signal)"
+      },
+      "columns_type": {
+        "numerical": 10,
+        "categorical": 1
+      },
+      "usage": ["DiffuTabGen (Plausibility Experiments)"]
+    },
+    {
+      "id": "cardio",
+      "name": "Cardiovascular Disease",
+      "description": "Dataset for cardiovascular disease detection.",
+      "origin": "Kaggle",
+      "stats": {
+        "rows": 70000,
+        "cols": 12,
+        "task": "Binary Classification",
+        "imbalance": "Balanced"
+      },
+      "columns_type": {
+        "numerical": "Mixed",
+        "categorical": "Mixed"
+      },
+      "usage": ["DiffuTabGen (Plausibility Experiments)"]
+    }
+  ],
+  "papers": [
+    {
+      "id": "diffutabgen",
+      "title": "TabDiffuGEN: Guided Diffusion for Synthetic Tabular Data Generation with User-Specified Constraints",
+      "authors": "Lakshay Kakkar, N. Rajasekhar Reddy, Srikanta Bedathur",
+      "year": 2025,
+      "link": "https://github.com/Project/DiffutabGen_Paper",
+      "results": [
+        {
+          "dataset": "adult",
+          "metric": "Plausibility Score (NLL)",
+          "value": "6.13"
+        },
+        {
+          "dataset": "loan",
+          "metric": "Plausibility Score (NLL)",
+          "value": "12.87"
+        },
+        {
+          "dataset": "cardio",
+          "metric": "Plausibility Score (NLL)",
+          "value": "15.54"
+        },
+        {
+            "dataset": "loan",
+            "metric": "Constraint Satisfaction (Multi-Controller)",
+            "value": "~95% (Top Constraints)"
+        },
+         {
+            "dataset": "loan",
+            "metric": "Constraint Satisfaction (Guided - Ours)",
+            "value": "100%"
+        }
+      ]
+    },
+     {
+      "id": "tabsyn",
+      "title": "TabSYN: Modeling Tabular Data with Diffusion Models",
+      "authors": "Zhang et al.",
+      "year": 2024,
+      "results": [
+        {
+             "dataset": "german",
+             "metric": "Overall Quality Score",
+             "value": "97.57%"
+        },
+         {
+             "dataset": "loan",
+             "metric": "Overall Quality Score",
+             "value": "97.24%"
+        },
+         {
+             "dataset": "dropout",
+             "metric": "Overall Quality Score",
+             "value": "75.9%"
+        }
+      ]
+    }
+  ]
+}

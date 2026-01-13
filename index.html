@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dataset Explorer | TabDiffuGen</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-globes">
+        <div class="globe globe-1"></div>
+        <div class="globe globe-2"></div>
+    </div>
+
+    <header class="glass-header">
+        <div class="logo">TabDiffuGen <span class="highlight">Data Explorer</span></div>
+        <nav>
+            <button id="btn-datasets" class="nav-btn active">Datasets</button>
+            <button id="btn-papers" class="nav-btn">Papers & Results</button>
+        </nav>
+    </header>
+
+    <main id="app-container">
+        <!-- Datasets View -->
+        <section id="datasets-view" class="view active-view">
+            <div class="hero">
+                <h1>Explore <span class="gradient-text">High-Dimensional</span> Tabular Datasets</h1>
+                <p>Comprehensive metadata, statistics, and benchmarks for modern synthetic data generation research.</p>
+            </div>
+            
+            <div id="dataset-grid" class="card-grid">
+                <!-- Cards injected by JS -->
+            </div>
+        </section>
+
+        <!-- Papers View -->
+        <section id="papers-view" class="view hidden-view">
+            <div class="hero">
+                <h1>Research <span class="gradient-text">Papers & Benchmarks</span></h1>
+                <p>Track performance metrics across state-of-the-art generative models.</p>
+            </div>
+            <div id="papers-list" class="wide-list">
+                 <!-- Papers injected by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for details -->
+    <div id="detail-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

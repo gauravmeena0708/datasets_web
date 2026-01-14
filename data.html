@@ -1,15 +1,24 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synthetic Data Research Hub</title>
+    <title>Metrics Reference - Synthetic Data Evaluation</title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
     <style>
-        /* Custom Scrollbar */
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -27,698 +36,943 @@
             background: #94a3b8;
         }
 
-
-        /* Math Styling */
-        .math-font {
-            font-family: 'Times New Roman', serif;
-            font-style: italic;
+        /* Metric card styling */
+        .metric-card {
+            transition: all 0.3s ease;
         }
 
-        /* Chart Container Utilities */
-        .chart-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(4px);
-            border: 1px solid #e2e8f0;
+        .metric-card.collapsed .expandable-content {
+            display: none;
+        }
+
+        /* Tab styling */
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Formula box */
+        .formula-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-left: 4px solid #667eea;
+        }
+
+        /* Range indicator */
+        .range-good {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .range-bad {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* Interactive calculator */
+        .calculator {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+        }
+
+        /* Code block */
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        /* Smooth animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Navigation link styling */
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid #667eea;
         }
     </style>
-
-
-
 </head>
 
-<body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
 
-
-    <!-- Sidebar Navigation -->
-    <aside
-        class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between hidden md:flex transition-all duration-300"
-        id="sidebar">
-        <div>
-            <div class="p-6 border-b border-slate-700">
-                <h1 class="text-xl font-bold text-white tracking-tight">SynData<span class="text-indigo-400">Hub</span>
-                </h1>
-                <p class="text-xs text-slate-500 mt-1">Research Companion</p>
-            </div>
-            <nav class="p-4 space-y-2">
-                <button onclick="switchView('dashboard')"
-                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3 active-nav bg-slate-800 text-white"
-                    data-target="dashboard">
-                    <span>📊</span> Dashboard Atlas
-                </button>
-                <button onclick="switchView('datasets')"
-                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3"
-                    data-target="datasets">
-                    <span>🗂️</span> Dataset Cheat Sheet
-                </button>
-                <button onclick="switchView('methods')"
-                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3"
-                    data-target="methods">
-                    <span>🤖</span> Methods & SOTA
-                </button>
-                <button onclick="switchView('metrics')"
-                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3"
-                    data-target="metrics">
-                    <span>📐</span> Metrics Glossary
-                </button>
-                <button onclick="switchView('papers')"
-                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3"
-                    data-target="papers">
-                    <span>📄</span> Source Papers
-                </button>
-            </nav>
-        </div>
-        <div class="p-4 border-t border-slate-700 text-xs text-slate-500">
-            Generated from 10 Research Papers
-        </div>
-    </aside>
-
-    <!-- Mobile Nav Header -->
-    <div class="md:hidden fixed top-0 left-0 w-full bg-slate-900 z-50 p-4 flex justify-between items-center text-white">
-        <span class="font-bold">SynDataHub</span>
-        <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="p-2">☰</button>
-    </div>
-    <div id="mobile-menu"
-        class="hidden fixed top-14 left-0 w-full bg-slate-800 z-40 p-4 text-white space-y-2 md:hidden">
-        <button onclick="switchView('dashboard'); document.getElementById('mobile-menu').classList.add('hidden')"
-            class="block w-full text-left p-2">Dashboard</button>
-        <button onclick="switchView('datasets'); document.getElementById('mobile-menu').classList.add('hidden')"
-            class="block w-full text-left p-2">Datasets</button>
-        <button onclick="switchView('methods'); document.getElementById('mobile-menu').classList.add('hidden')"
-            class="block w-full text-left p-2">Methods</button>
-    </div>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto relative pt-16 md:pt-0">
-
-        <!-- View: Dashboard Atlas -->
-        <section id="dashboard" class="view-section p-6 md:p-10 space-y-8">
-            <header class="mb-8">
-                <h2 class="text-3xl font-bold text-slate-900">Landscape Overview</h2>
-                <p class="text-slate-600 max-w-3xl mt-2">
-                    A visual map of the datasets used across the attached papers (TabDDPM, TabSyn, etc.). Use this to
-                    quickly contextualize a dataset's size and complexity during your discussion.
-                </p>
-            </header>
-
-            <!-- Top Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-sm text-slate-500 font-medium">Total Datasets Analyzed</div>
-                    <div class="text-3xl font-bold text-indigo-600 mt-2">14</div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-sm text-slate-500 font-medium">Most Common Dataset</div>
-                    <div class="text-3xl font-bold text-emerald-600 mt-2">Adult (Census)</div>
-                    <div class="text-xs text-slate-400 mt-1">Used in 9/10 papers</div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-sm text-slate-500 font-medium">Largest Dataset</div>
-                    <div class="text-3xl font-bold text-amber-600 mt-2">Covertype</div>
-                    <div class="text-xs text-slate-400 mt-1">581k Rows</div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-sm text-slate-500 font-medium">Primary Evaluation</div>
-                    <div class="text-3xl font-bold text-blue-600 mt-2">TSTR (MLE)</div>
-                    <div class="text-xs text-slate-400 mt-1">Train on Synthetic, Test on Real</div>
-                </div>
-            </div>
-
-            <!-- Main Scatter Plot -->
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-lg font-semibold mb-4">Dataset Complexity Map (Rows vs. Columns)</h3>
-                <div class="w-full h-96 relative chart-container">
-                    <canvas id="atlasChart"></canvas>
-                </div>
-                <p class="text-xs text-slate-400 mt-4 text-center">
-                    *X-Axis is Log Scale. Hover for detailed stats.
-                </p>
-            </div>
-        </section>
-
-        <!-- View: Dataset Cheat Sheet -->
-        <section id="datasets" class="view-section hidden p-6 md:p-10 space-y-8">
-            <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-3xl font-bold text-slate-900">Dataset Repository</h2>
-                    <p class="text-slate-600 mt-2">Quick-reference cards with the exact numbers you need.</p>
+                    <h1 class="text-3xl font-bold">Metrics Reference Dashboard</h1>
+                    <p class="text-indigo-100 mt-1">Comprehensive guide to synthetic data evaluation metrics</p>
                 </div>
-                <input type="text" id="datasetSearch" placeholder="Search datasets (e.g., 'Adult', 'Imbalanced')..."
-                    class="w-full md:w-64 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-            </header>
-
-            <div class="flex gap-2 flex-wrap text-sm" id="datasetFilters">
-                <button
-                    class="filter-btn px-3 py-1 bg-slate-200 rounded-full hover:bg-indigo-100 hover:text-indigo-800 transition-colors"
-                    data-filter="all">All</button>
-                <button
-                    class="filter-btn px-3 py-1 bg-slate-200 rounded-full hover:bg-indigo-100 hover:text-indigo-800 transition-colors"
-                    data-filter="imbalanced">High Imbalance</button>
-                <button
-                    class="filter-btn px-3 py-1 bg-slate-200 rounded-full hover:bg-indigo-100 hover:text-indigo-800 transition-colors"
-                    data-filter="numerical">Numerical Only</button>
-                <button
-                    class="filter-btn px-3 py-1 bg-slate-200 rounded-full hover:bg-indigo-100 hover:text-indigo-800 transition-colors"
-                    data-filter="mixed">Mixed Type</button>
+                <nav class="hidden md:flex gap-4">
+                    <a href="index.html" class="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition">
+                        🏠 Dataset Explorer
+                    </a>
+                    <a href="data.html" class="px-4 py-2 bg-white/30 rounded-lg">
+                        📊 Metrics Reference
+                    </a>
+                </nav>
             </div>
+        </div>
+    </header>
 
-            <div id="datasetGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-                <!-- Cards injected by JS -->
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8">
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-indigo-500">
+                <div class="text-sm text-gray-500 font-medium">Total Metrics</div>
+                <div class="text-3xl font-bold text-indigo-600 mt-2">25+</div>
+                <div class="text-xs text-gray-400 mt-1">Across 5 categories</div>
             </div>
-        </section>
-
-        <!-- View: Methods -->
-        <section id="methods" class="view-section hidden p-6 md:p-10 space-y-8">
-            <header>
-                <h2 class="text-3xl font-bold text-slate-900">Methodologies & Performance</h2>
-                <p class="text-slate-600 mt-2">Comparison of key synthetic data generation techniques found in the
-                    literature.</p>
-            </header>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Method Explainer -->
-                <div class="space-y-6">
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-lg text-indigo-700 mb-2">TabDDPM (2022)</h3>
-                        <p class="text-sm text-slate-600 mb-3">
-                            <span class="font-semibold">Core:</span> Denoising Diffusion Probabilistic Model.
-                        </p>
-                        <ul class="text-sm space-y-2 list-disc pl-4 text-slate-600">
-                            <li><strong>Encoding:</strong> Gaussian Quantile for numerical, One-hot for categorical.
-                            </li>
-                            <li><strong>Process:</strong> Adds Gaussian noise to embeddings, learns to reverse it.</li>
-                            <li><strong>Pros:</strong> SOTA performance on many tasks, handles mixed types well.</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-lg text-emerald-700 mb-2">TabSyn (2024)</h3>
-                        <p class="text-sm text-slate-600 mb-3">
-                            <span class="font-semibold">Core:</span> Latent Diffusion Model (VAE + Diffusion).
-                        </p>
-                        <ul class="text-sm space-y-2 list-disc pl-4 text-slate-600">
-                            <li><strong>Strategy:</strong> Compresses data into a latent space using a VAE first.</li>
-                            <li><strong>Benefit:</strong> Faster sampling than TabDDPM (diffusion happens in smaller
-                                latent space).</li>
-                            <li><strong>Key Result:</strong> Better structure preservation (shapes) than pure diffusion.
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-lg text-amber-700 mb-2">GReaT (2022)</h3>
-                        <p class="text-sm text-slate-600 mb-3">
-                            <span class="font-semibold">Core:</span> LLM Fine-tuning (DistilGPT-2).
-                        </p>
-                        <ul class="text-sm space-y-2 list-disc pl-4 text-slate-600">
-                            <li><strong>Technique:</strong> Serializes tabular rows into text sentences ("Age is 30,
-                                Income is...").</li>
-                            <li><strong>Pros:</strong> Excellent semantic understanding, conditioning is natural
-                                language.</li>
-                            <li><strong>Cons:</strong> Slow training/sampling, context window limits.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Performance Chart -->
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-fit">
-                    <h3 class="text-lg font-semibold mb-4">Performance Comparison (Adult Dataset)</h3>
-                    <p class="text-xs text-slate-500 mb-4">Machine Learning Efficacy (F1-Score / Accuracy). Higher is
-                        better.</p>
-                    <div class="w-full h-80 relative chart-container">
-                        <canvas id="performanceChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-xs text-slate-500 bg-slate-50 p-3 rounded">
-                        <span class="font-bold">Note:</span> Real data baseline is usually ~0.85-0.86 for Adult. TabDDPM
-                        and TabSyn consistently reach >0.84, often outperforming GAN-based methods (CTGAN ~0.81).
-                    </div>
-                </div>
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-emerald-500">
+                <div class="text-sm text-gray-500 font-medium">Statistical</div>
+                <div class="text-3xl font-bold text-emerald-600 mt-2">9</div>
+                <div class="text-xs text-gray-400 mt-1">Fidelity metrics</div>
             </div>
-        </section>
-
-        <!-- View: Metrics -->
-        <section id="metrics" class="view-section hidden p-6 md:p-10 space-y-8">
-            <header>
-                <h2 class="text-3xl font-bold text-slate-900">Evaluation Metrics</h2>
-                <p class="text-slate-600 mt-2">Common formulas used to validate synthetic data quality.</p>
-            </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- MLE -->
-                <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-blue-500 shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-lg">Machine Learning Efficacy (MLE)</h3>
-                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Utility</span>
-                    </div>
-                    <p class="text-sm text-slate-600 mt-2">Also known as TSTR (Train on Synthetic, Test on Real).</p>
-                    <div class="bg-slate-50 p-4 mt-4 rounded font-mono text-center text-sm border border-slate-200">
-                        Score = Accuracy(M<sub>synth</sub> on D<sub>real</sub>)
-                    </div>
-                    <p class="text-xs text-slate-500 mt-3">
-                        <span class="font-semibold">Interpretation:</span> If the score is close to "Train on Real, Test
-                        on Real", the synthetic data successfully captured the predictive signals.
-                    </p>
-                </div>
-
-                <!-- Wasserstein -->
-                <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-purple-500 shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-lg">Wasserstein Distance</h3>
-                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Fidelity</span>
-                    </div>
-                    <p class="text-sm text-slate-600 mt-2">Measures the distance between the distribution of real and
-                        synthetic columns.</p>
-                    <div class="bg-slate-50 p-4 mt-4 rounded font-mono text-center text-sm border border-slate-200">
-                        W(P, Q) = inf E[d(x, y)]
-                    </div>
-                    <p class="text-xs text-slate-500 mt-3">
-                        <span class="font-semibold">Interpretation:</span> Lower is better. 0 means distributions are
-                        identical. Usually calculated column-wise and averaged.
-                    </p>
-                </div>
-
-                <!-- DCR -->
-                <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-red-500 shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-lg">Distance to Closest Record (DCR)</h3>
-                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Privacy</span>
-                    </div>
-                    <p class="text-sm text-slate-600 mt-2">Ensures synthetic data is not just copying real data.</p>
-                    <div class="bg-slate-50 p-4 mt-4 rounded font-mono text-center text-sm border border-slate-200">
-                        DCR = min || x<sub>synth</sub> - x<sub>real</sub> ||
-                    </div>
-                    <p class="text-xs text-slate-500 mt-3">
-                        <span class="font-semibold">Interpretation:</span> We want this distance to be non-zero (to
-                        avoid memorization) but not too large (to maintain realism).
-                    </p>
-                </div>
-
-                <!-- Statistical Difference -->
-                <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-green-500 shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-lg">Correlation Matrix Difference</h3>
-                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Structure</span>
-                    </div>
-                    <p class="text-sm text-slate-600 mt-2">Checks if pairwise relationships are preserved.</p>
-                    <div class="bg-slate-50 p-4 mt-4 rounded font-mono text-center text-sm border border-slate-200">
-                        || Corr(Real) - Corr(Synth) ||<sub>2</sub>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-3">
-                        <span class="font-semibold">Interpretation:</span> Lower is better. Visualized often as a
-                        heatmap difference.
-                    </p>
-                </div>
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-amber-500">
+                <div class="text-sm text-gray-500 font-medium">Privacy</div>
+                <div class="text-3xl font-bold text-amber-600 mt-2">8</div>
+                <div class="text-xs text-gray-400 mt-1">Protection metrics</div>
             </div>
-        </section>
-
-        <!-- View: Source Papers -->
-        <section id="papers" class="view-section hidden p-6 md:p-10 space-y-8">
-            <header>
-                <h2 class="text-3xl font-bold text-slate-900">Source Papers</h2>
-                <p class="text-slate-600 mt-2">Summary of the uploaded documents driving this repository.</p>
-            </header>
-            <div class="space-y-4" id="paperList">
-                <!-- Populated by JS -->
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
+                <div class="text-sm text-gray-500 font-medium">ML Efficacy</div>
+                <div class="text-3xl font-bold text-blue-600 mt-2">6</div>
+                <div class="text-xs text-gray-400 mt-1">Utility metrics</div>
             </div>
-        </section>
+        </div>
 
-    </main>
+        <!-- Search Bar -->
+        <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+            <input type="text" id="metricSearch"
+                placeholder="🔍 Search metrics (e.g., 'Wasserstein', 'Privacy', 'Accuracy')..."
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none text-lg">
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="bg-white rounded-xl shadow-md p-2 mb-6">
+            <div class="flex flex-wrap gap-2">
+                <button class="tab-btn active px-6 py-3 rounded-lg font-semibold transition" data-category="all">
+                    📊 All Metrics
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-lg font-semibold transition bg-gray-100 hover:bg-gray-200"
+                    data-category="statistical">
+                    📈 Statistical Fidelity
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-lg font-semibold transition bg-gray-100 hover:bg-gray-200"
+                    data-category="ml">
+                    🤖 ML Efficacy
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-lg font-semibold transition bg-gray-100 hover:bg-gray-200"
+                    data-category="privacy">
+                    🔒 Privacy
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-lg font-semibold transition bg-gray-100 hover:bg-gray-200"
+                    data-category="coverage">
+                    📦 Coverage
+                </button>
+            </div>
+        </div>
+
+        <!-- Metrics Container -->
+        <div id="metricsContainer" class="space-y-6">
+            <!-- Metrics will be injected here by JavaScript -->
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16 py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-gray-400">Metrics Reference Dashboard | Based on sdeval and research papers</p>
+            <p class="text-gray-500 text-sm mt-2">For research and educational purposes</p>
+        </div>
+    </footer>
 
     <script>
-        // --- DATA REPOSITORY ---
+        // Metrics data structure
+        const metricsData = {
+            statistical: [
+                {
+                    name: "Alpha Precision (α)",
+                    symbol: "\\alpha",
+                    category: "statistical",
+                    subcategory: "Categorical",
+                    formula: "\\alpha = \\frac{|S_{syn} \\cap S_{real}|}{|S_{syn}|}",
+                    description: "Measures the fraction of synthetic categorical values that exist in the real data.",
+                    interpretation: "Higher values indicate better quality - synthetic data only contains realistic categories.",
+                    range: "[0, 1]",
+                    bestValue: "1.0 (all synthetic values are realistic)",
+                    worstValue: "0.0 (no synthetic values match real data)",
+                    code: `from sdeval.metrics.statistical import compute_alpha_precision
 
-        // Comprehensive Dataset List derived from uploaded papers (TabDDPM, TabSyn, etc.)
-        const datasets = [
-            {
-                id: 'adult',
-                name: 'Adult (Census Income)',
-                rows: 48842,
-                cols: 14,
-                numerical: 6,
-                categorical: 8,
-                task: 'Binary Classification',
-                target: 'Income (>50K)',
-                imbalance: '24% Minority (>50K)',
-                tags: ['imbalanced', 'mixed', 'benchmark']
-            },
-            {
-                id: 'cal_housing',
-                name: 'California Housing',
-                rows: 20640,
-                cols: 8,
-                numerical: 8,
-                categorical: 0,
-                task: 'Regression',
-                target: 'Median House Value',
-                imbalance: 'N/A',
-                tags: ['numerical', 'regression']
-            },
-            {
-                id: 'higgs',
-                name: 'Higgs Boson',
-                rows: 98050,
-                cols: 28,
-                numerical: 28,
-                categorical: 0,
-                task: 'Binary Classification',
-                target: 'Signal/Background',
-                imbalance: '47% Minority (Balanced)',
-                tags: ['numerical', 'large', 'physics']
-            },
-            {
-                id: 'diabetes',
-                name: 'Diabetes (Pima)',
-                rows: 768,
-                cols: 8,
-                numerical: 8,
-                categorical: 0,
-                task: 'Binary Classification',
-                target: 'Outcome',
-                imbalance: '35% Minority',
-                tags: ['small', 'medical', 'numerical']
-            },
-            {
-                id: 'bank',
-                name: 'Bank Marketing',
-                rows: 45211,
-                cols: 17,
-                numerical: 7,
-                categorical: 10,
-                task: 'Binary Classification',
-                target: 'Deposit (Yes/No)',
-                imbalance: '11.7% Minority (Yes)',
-                tags: ['imbalanced', 'mixed']
-            },
-            {
-                id: 'covertype',
-                name: 'Forest Covertype',
-                rows: 581012,
-                cols: 54,
-                numerical: 10,
-                categorical: 44, // Usually encoded
-                task: 'Multiclass Classification',
-                target: 'Cover Type (7 classes)',
-                imbalance: 'High (Classes 1&2 dominate)',
-                tags: ['large', 'multiclass', 'mixed']
-            },
-            {
-                id: 'shoppers',
-                name: 'Online Shoppers',
-                rows: 12330,
-                cols: 18,
-                numerical: 10,
-                categorical: 8,
-                task: 'Binary Classification',
-                target: 'Revenue',
-                imbalance: '15.5% Minority',
-                tags: ['mixed', 'imbalanced']
-            },
-            {
-                id: 'credit',
-                name: 'Default Credit',
-                rows: 30000,
-                cols: 24,
-                numerical: 23,
-                categorical: 1, // Often treated as num
-                task: 'Binary Classification',
-                target: 'Default',
-                imbalance: '22% Minority',
-                tags: ['numerical', 'imbalanced', 'financial']
-            },
-            {
-                id: 'beijing',
-                name: 'Beijing PM2.5',
-                rows: 43824,
-                cols: 13,
-                numerical: 9,
-                categorical: 4,
-                task: 'Regression',
-                target: 'PM2.5 Concentration',
-                imbalance: 'N/A',
-                tags: ['regression', 'environmental']
-            },
-            {
-                id: 'compas',
-                name: 'COMPAS Recidivism',
-                rows: 6172,
-                cols: 13, // Varies by preprocessing
-                numerical: 7,
-                categorical: 6,
-                task: 'Binary Classification',
-                target: 'TwoYearRecid',
-                imbalance: 'Balanced',
-                tags: ['fairness', 'mixed', 'small']
-            }
-        ];
+alpha = compute_alpha_precision(
+    real_df=real_data,
+    synthetic_df=synthetic_data,
+    categorical_columns=['gender', 'education', 'occupation']
+)
+print(f"Alpha Precision: {alpha:.3f}")`,
+                    example: {
+                        real: ["A", "B", "C"],
+                        synthetic: ["A", "B", "D"],
+                        result: "α = 2/3 = 0.667 (2 out of 3 synthetic values exist in real)"
+                    }
+                },
+                {
+                    name: "Beta Recall (β)",
+                    symbol: "\\beta",
+                    category: "statistical",
+                    subcategory: "Categorical",
+                    formula: "\\beta = \\frac{|S_{syn} \\cap S_{real}|}{|S_{real}|}",
+                    description: "Measures the fraction of real categorical values that are covered by the synthetic data.",
+                    interpretation: "Higher values indicate better coverage - synthetic data represents all real categories.",
+                    range: "[0, 1]",
+                    bestValue: "1.0 (all real categories are represented)",
+                    worstValue: "0.0 (no real categories are covered)",
+                    code: `from sdeval.metrics.statistical import compute_beta_recall
 
-        const papers = [
-            { title: "TabDDPM", desc: "Diffusion models for tabular data using Gaussian multinomial diffusion." },
-            { title: "TabSyn", desc: "Latent space diffusion (VAE + Diffusion) for faster sampling." },
-            { title: "GReaT", desc: "LLM-based generation treating tabular data as text sentences." },
-            { title: "CuTS", desc: "Customizable generation with logical constraints." },
-            { title: "TabDiff", desc: "Transformer-based mixed-type diffusion." },
-            { title: "Fair Tab Diffusion", desc: "Balanced synthesis to mitigate bias in sensitive attributes." },
-            { title: "RELDDPM", desc: "Controllable synthesis using relational constraints." }
-        ];
+beta = compute_beta_recall(
+    real_df=real_data,
+    synthetic_df=synthetic_data,
+    categorical_columns=['gender', 'education', 'occupation']
+)
+print(f"Beta Recall: {beta:.3f}")`,
+                    example: {
+                        real: ["A", "B", "C"],
+                        synthetic: ["A", "B"],
+                        result: "β = 2/3 = 0.667 (2 out of 3 real values are covered)"
+                    }
+                },
+                {
+                    name: "Wasserstein Distance",
+                    symbol: "W",
+                    category: "statistical",
+                    subcategory: "Numerical",
+                    formula: "W(P, Q) = \\inf_{\\gamma \\in \\Gamma(P,Q)} \\mathbb{E}_{(x,y)\\sim\\gamma}[||x-y||]",
+                    description: "Also known as Earth Mover's Distance. Measures the minimum cost to transform one distribution into another.",
+                    interpretation: "Lower values indicate distributions are more similar. Sensitive to both location and shape differences.",
+                    range: "[0, ∞)",
+                    bestValue: "0.0 (identical distributions)",
+                    worstValue: "Higher values indicate greater dissimilarity",
+                    code: `from sdeval.metrics.statistical import compute_wasserstein_distance
 
-        // --- APP LOGIC ---
+wasserstein = compute_wasserstein_distance(
+    real_df=real_data,
+    synthetic_df=synthetic_data,
+    numerical_columns=['age', 'income', 'hours_per_week']
+)
+print(f"Wasserstein Distance: {wasserstein:.4f}")`,
+                    example: {
+                        interpretation: "If W=0.15 for 'age' column, synthetic ages need to 'move' 0.15 units on average to match real distribution"
+                    }
+                },
+                {
+                    name: "Kolmogorov-Smirnov (KS) Statistic",
+                    symbol: "D_{KS}",
+                    category: "statistical",
+                    subcategory: "Numerical",
+                    formula: "D_{KS} = \\sup_x |F_{real}(x) - F_{syn}(x)|",
+                    description: "Maximum absolute difference between cumulative distribution functions (CDFs) of real and synthetic data.",
+                    interpretation: "Lower values indicate more similar distributions. Non-parametric test that's sensitive to any differences.",
+                    range: "[0, 1]",
+                    bestValue: "0.0 (identical CDFs)",
+                    worstValue: "1.0 (completely different distributions)",
+                    code: `from scipy.stats import ks_2samp
 
-        // State
-        let currentFilter = 'all';
-        let charts = {};
+# For each numerical column
+ks_stat, p_value = ks_2samp(
+    real_data['age'],
+    synthetic_data['age']
+)
+print(f"KS Statistic: {ks_stat:.4f}, p-value: {p_value:.4f}")`,
+                    example: {
+                        interpretation: "KS=0.05 with p>0.05 suggests distributions are statistically similar"
+                    }
+                },
+                {
+                    name: "Jensen-Shannon Divergence (JSD)",
+                    symbol: "JSD",
+                    category: "statistical",
+                    subcategory: "Numerical",
+                    formula: "JSD(P||Q) = \\frac{1}{2}D_{KL}(P||M) + \\frac{1}{2}D_{KL}(Q||M), \\quad M = \\frac{1}{2}(P+Q)",
+                    description: "Symmetric and smoothed version of KL divergence. Measures similarity between probability distributions.",
+                    interpretation: "Lower values indicate more similar distributions. Bounded and symmetric unlike KL divergence.",
+                    range: "[0, 1]",
+                    bestValue: "0.0 (identical distributions)",
+                    worstValue: "1.0 (completely different distributions)",
+                    code: `from scipy.spatial.distance import jensenshannon
+import numpy as np
 
-        // Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            renderDatasetCards();
-            renderPaperList();
-            initCharts();
-            setupEventListeners();
-        });
+# Create histograms
+real_hist, bins = np.histogram(real_data['age'], bins=50, density=True)
+syn_hist, _ = np.histogram(synthetic_data['age'], bins=bins, density=True)
 
-        // Event Listeners
-        function setupEventListeners() {
-            // Search
-            document.getElementById('datasetSearch').addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                renderDatasetCards(term);
-            });
+# Compute JSD
+jsd = jensenshannon(real_hist, syn_hist, base=2.0) ** 2
+print(f"Jensen-Shannon Divergence: {jsd:.4f}")`,
+                    example: {
+                        interpretation: "JSD=0.02 indicates very similar distributions (< 0.1 is generally good)"
+                    }
+                },
+                {
+                    name: "Mean Absolute Difference",
+                    symbol: "MAD",
+                    category: "statistical",
+                    subcategory: "Numerical",
+                    formula: "MAD = \\frac{1}{n}\\sum_{i=1}^{n}|\\mu_{real}^{(i)} - \\mu_{syn}^{(i)}|",
+                    description: "Average absolute difference between column means of real and synthetic data.",
+                    interpretation: "Lower values indicate synthetic data preserves the central tendency of real data.",
+                    range: "[0, ∞)",
+                    bestValue: "0.0 (identical means)",
+                    worstValue: "Higher values indicate larger discrepancies",
+                    code: `from sdeval.metrics.statistical import compute_mean_absolute_difference
 
-            // Filters
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    // UI Update
-                    document.querySelectorAll('.filter-btn').forEach(b => {
-                        b.classList.remove('bg-indigo-600', 'text-white');
-                        b.classList.add('bg-slate-200');
-                    });
-                    e.target.classList.remove('bg-slate-200');
-                    e.target.classList.add('bg-indigo-600', 'text-white');
+mad = compute_mean_absolute_difference(
+    real_df=real_data,
+    synthetic_df=synthetic_data,
+    numerical_columns=['age', 'income', 'hours_per_week']
+)
+print(f"Mean Absolute Difference: {mad:.4f}")`,
+                    example: {
+                        calculation: "If real mean age=38.5 and synthetic mean age=38.2, contribution is |38.5-38.2|=0.3"
+                    }
+                },
+                {
+                    name: "Std Absolute Difference",
+                    symbol: "SAD",
+                    category: "statistical",
+                    subcategory: "Numerical",
+                    formula: "SAD = \\frac{1}{n}\\sum_{i=1}^{n}|\\sigma_{real}^{(i)} - \\sigma_{syn}^{(i)}|",
+                    description: "Average absolute difference between column standard deviations of real and synthetic data.",
+                    interpretation: "Lower values indicate synthetic data preserves the spread/variability of real data.",
+                    range: "[0, ∞)",
+                    bestValue: "0.0 (identical standard deviations)",
+                    worstValue: "Higher values indicate larger discrepancies in variability",
+                    code: `from sdeval.metrics.statistical import compute_std_absolute_difference
 
-                    currentFilter = e.target.dataset.filter;
-                    renderDatasetCards(document.getElementById('datasetSearch').value.toLowerCase());
-                });
-            });
-        }
+sad = compute_std_absolute_difference(
+    real_df=real_data,
+    synthetic_df=synthetic_data,
+    numerical_columns=['age', 'income', 'hours_per_week']
+)
+print(f"Std Absolute Difference: {sad:.4f}")`,
+                    example: {
+                        calculation: "If real std=12.5 and synthetic std=12.8, contribution is |12.5-12.8|=0.3"
+                    }
+                },
+                {
+                    name: "Correlation Delta (Frobenius)",
+                    symbol: "||\\Delta C||_F",
+                    category: "statistical",
+                    subcategory: "Numerical",
+                    formula: "||\\Delta C||_F = ||C_{real} - C_{syn}||_F = \\sqrt{\\sum_{i,j}(C_{real}^{ij} - C_{syn}^{ij})^2}",
+                    description: "Frobenius norm of the difference between correlation matrices. Measures how well synthetic data preserves feature relationships.",
+                    interpretation: "Lower values indicate better preservation of correlations between features.",
+                    range: "[0, ∞)",
+                    bestValue: "0.0 (identical correlation structures)",
+                    worstValue: "Higher values indicate different correlation patterns",
+                    code: `import numpy as np
 
-        // View Switching
-        window.switchView = (viewId) => {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(viewId).classList.remove('hidden');
+# Compute correlation matrices
+real_corr = real_data[numerical_cols].corr()
+syn_corr = synthetic_data[numerical_cols].corr()
 
-            // Nav Active State
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if (btn.dataset.target === viewId) {
-                    btn.classList.add('bg-slate-800', 'text-white');
-                } else {
-                    btn.classList.remove('bg-slate-800', 'text-white');
+# Frobenius norm of difference
+corr_delta = np.linalg.norm(real_corr - syn_corr, ord='fro')
+print(f"Correlation Delta: {corr_delta:.4f}")`,
+                    example: {
+                        interpretation: "If delta=0.5 for 5 features, correlation structure is reasonably preserved"
+                    }
+                },
+                {
+                    name: "Chi-Square Test",
+                    symbol: "\\chi^2",
+                    category: "statistical",
+                    subcategory: "Categorical",
+                    formula: "\\chi^2 = \\sum_{i=1}^{k}\\frac{(O_i - E_i)^2}{E_i}",
+                    description: "Statistical test comparing observed (synthetic) vs expected (real) frequencies for categorical variables.",
+                    interpretation: "Higher p-values (>0.05) indicate distributions are statistically similar. Lower chi-square values are better.",
+                    range: "[0, ∞)",
+                    bestValue: "Low χ² with high p-value (distributions match)",
+                    worstValue: "High χ² with low p-value (distributions differ significantly)",
+                    code: `from scipy.stats import chisquare
+
+# Get value counts
+real_counts = real_data['education'].value_counts()
+syn_counts = synthetic_data['education'].value_counts()
+
+# Align categories
+categories = real_counts.index.union(syn_counts.index)
+obs = syn_counts.reindex(categories, fill_value=0)
+exp = real_counts.reindex(categories, fill_value=0)
+
+# Normalize expected to match observed total
+exp = exp / exp.sum() * obs.sum()
+
+chi2_stat, p_value = chisquare(f_obs=obs, f_exp=exp)
+print(f"Chi-Square: {chi2_stat:.2f}, p-value: {p_value:.4f}")`,
+                    example: {
+                        interpretation: "χ²=5.2, p=0.27 suggests synthetic categorical distribution matches real data well"
+                    }
                 }
-            });
+            ],
+            ml: [
+                {
+                    name: "TSTR Accuracy",
+                    symbol: "Acc_{TSTR}",
+                    category: "ml",
+                    subcategory: "Classification",
+                    formula: "Acc = \\frac{TP + TN}{TP + TN + FP + FN}",
+                    description: "Train on Synthetic, Test on Real. Measures if a model trained on synthetic data can predict real data accurately.",
+                    interpretation: "Higher accuracy indicates synthetic data captures the predictive patterns of real data. Compare with TRTR (train/test on real) as baseline.",
+                    range: "[0, 1]",
+                    bestValue: "Close to TRTR accuracy (synthetic is as useful as real)",
+                    worstValue: "Much lower than TRTR (synthetic data is not useful)",
+                    code: `from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Train on synthetic
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+X_syn = synthetic_data.drop('target', axis=1)
+y_syn = synthetic_data['target']
+model.fit(X_syn, y_syn)
+
+# Test on real
+X_real = real_data.drop('target', axis=1)
+y_real = real_data['target']
+predictions = model.predict(X_real)
+
+tstr_accuracy = accuracy_score(y_real, predictions)
+print(f"TSTR Accuracy: {tstr_accuracy:.3f}")`,
+                    example: {
+                        interpretation: "If TRTR=0.85 and TSTR=0.82, synthetic data is 96% as useful (good quality)"
+                    }
+                },
+                {
+                    name: "F1 Score (Macro)",
+                    symbol: "F1_{macro}",
+                    category: "ml",
+                    subcategory: "Classification",
+                    formula: "F1 = 2 \\cdot \\frac{Precision \\cdot Recall}{Precision + Recall}, \\quad F1_{macro} = \\frac{1}{K}\\sum_{k=1}^{K}F1_k",
+                    description: "Harmonic mean of precision and recall, averaged across all classes. Useful for imbalanced datasets.",
+                    interpretation: "Higher F1 indicates better balance between precision and recall. Macro averaging treats all classes equally.",
+                    range: "[0, 1]",
+                    bestValue: "1.0 (perfect precision and recall)",
+                    worstValue: "0.0 (no correct predictions)",
+                    code: `from sklearn.metrics import f1_score
+
+# After training model on synthetic and testing on real
+f1_macro = f1_score(y_real, predictions, average='macro')
+print(f"F1 Score (Macro): {f1_macro:.3f}")`,
+                    example: {
+                        interpretation: "F1=0.78 indicates reasonably balanced performance across all classes"
+                    }
+                },
+                {
+                    name: "RMSE (Root Mean Squared Error)",
+                    symbol: "RMSE",
+                    category: "ml",
+                    subcategory: "Regression",
+                    formula: "RMSE = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2}",
+                    description: "Square root of average squared prediction errors. Penalizes large errors more than small ones.",
+                    interpretation: "Lower RMSE indicates better predictions. In same units as target variable.",
+                    range: "[0, ∞)",
+                    bestValue: "0.0 (perfect predictions)",
+                    worstValue: "Higher values indicate larger prediction errors",
+                    code: `from sklearn.metrics import mean_squared_error
+import numpy as np
+
+# After training regressor on synthetic and testing on real
+rmse = np.sqrt(mean_squared_error(y_real, predictions))
+print(f"RMSE: {rmse:.4f}")`,
+                    example: {
+                        interpretation: "If predicting age, RMSE=5.2 means predictions are off by ~5.2 years on average"
+                    }
+                },
+                {
+                    name: "MAE (Mean Absolute Error)",
+                    symbol: "MAE",
+                    category: "ml",
+                    subcategory: "Regression",
+                    formula: "MAE = \\frac{1}{n}\\sum_{i=1}^{n}|y_i - \\hat{y}_i|",
+                    description: "Average absolute difference between predictions and actual values. More robust to outliers than RMSE.",
+                    interpretation: "Lower MAE indicates better predictions. Easier to interpret than RMSE.",
+                    range: "[0, ∞)",
+                    bestValue: "0.0 (perfect predictions)",
+                    worstValue: "Higher values indicate larger prediction errors",
+                    code: `from sklearn.metrics import mean_absolute_error
+
+mae = mean_absolute_error(y_real, predictions)
+print(f"MAE: {mae:.4f}")`,
+                    example: {
+                        interpretation: "MAE=3.8 for age prediction means average error is 3.8 years"
+                    }
+                },
+                {
+                    name: "R² Score (Coefficient of Determination)",
+                    symbol: "R^2",
+                    category: "ml",
+                    subcategory: "Regression",
+                    formula: "R^2 = 1 - \\frac{SS_{res}}{SS_{tot}} = 1 - \\frac{\\sum(y_i - \\hat{y}_i)^2}{\\sum(y_i - \\bar{y})^2}",
+                    description: "Proportion of variance in the target variable explained by the model. Indicates goodness of fit.",
+                    interpretation: "Higher R² indicates better fit. Can be negative if model is worse than predicting the mean.",
+                    range: "(-∞, 1]",
+                    bestValue: "1.0 (perfect fit)",
+                    worstValue: "Negative values (worse than baseline)",
+                    code: `from sklearn.metrics import r2_score
+
+r2 = r2_score(y_real, predictions)
+print(f"R² Score: {r2:.4f}")`,
+                    example: {
+                        interpretation: "R²=0.75 means model explains 75% of variance in target variable"
+                    }
+                }
+            ],
+            privacy: [
+                {
+                    name: "DCR (Distance to Closest Record)",
+                    symbol: "DCR_t",
+                    category: "privacy",
+                    subcategory: "Distance-Based",
+                    formula: "DCR_t = \\frac{1}{|S_{syn}|}\\sum_{s \\in S_{syn}} \\mathbb{1}[\\min_{r \\in S_{real}} d(s,r) < t]",
+                    description: "Fraction of synthetic records that are suspiciously close to real records (within threshold t). Indicates potential privacy leakage.",
+                    interpretation: "Lower DCR is better for privacy. Common thresholds: 1e-8, 1e-6, 1e-4, 1e-2.",
+                    range: "[0, 1]",
+                    bestValue: "0.0 (no synthetic records too close to real)",
+                    worstValue: "1.0 (all synthetic records are copies of real)",
+                    code: `from sdeval.metrics.privacy import compute_dcr
+
+dcr = compute_dcr(
+    real_df=real_data,
+    synthetic_df=synthetic_data,
+    numerical_columns=['age', 'income', 'hours_per_week'],
+    threshold=1e-6
+)
+print(f"DCR at 1e-6: {dcr:.4f}")`,
+                    example: {
+                        interpretation: "DCR=0.02 at threshold 1e-6 means 2% of synthetic records are very close to real (potential privacy risk)"
+                    }
+                },
+                {
+                    name: "NNDR (Nearest Neighbor Distance Ratio)",
+                    symbol: "NNDR",
+                    category: "privacy",
+                    subcategory: "Distance-Based",
+                    formula: "NNDR = \\frac{d_1}{d_2}",
+                    description: "Ratio of distance to nearest real neighbor vs second-nearest. Lower values suggest synthetic record is suspiciously similar to one specific real record.",
+                    interpretation: "Higher NNDR is better for privacy. Values close to 1.0 indicate synthetic record is equidistant from multiple real records (good).",
+                    range: "[0, 1]",
+                    bestValue: "~1.0 (equidistant from multiple real records)",
+                    worstValue: "~0.0 (very close to one specific real record)",
+                    code: `from sdeval.metrics.privacy import compute_nndr
+
+nndr = compute_nndr(
+    real_df=real_data,
+    synthetic_df=synthetic_data,
+    numerical_columns=['age', 'income', 'hours_per_week']
+)
+print(f"NNDR: {nndr:.4f}")`,
+                    example: {
+                        interpretation: "NNDR=0.85 suggests synthetic records are reasonably distributed (good privacy)"
+                    }
+                },
+                {
+                    name: "Distance Percentiles",
+                    symbol: "d_{p50}, d_{p95}",
+                    category: "privacy",
+                    subcategory: "Distance-Based",
+                    formula: "d_{p} = \\text{percentile}_p(\\{\\min_{r \\in S_{real}} d(s,r) : s \\in S_{syn}\\})",
+                    description: "Distribution of nearest neighbor distances. Higher percentiles indicate better privacy protection.",
+                    interpretation: "Higher distances are better. p50 (median) and p95 are commonly reported.",
+                    range: "[0, ∞)",
+                    bestValue: "Higher values (synthetic records are far from real)",
+                    worstValue: "Lower values (synthetic records are close to real)",
+                    code: `import numpy as np
+from sklearn.neighbors import NearestNeighbors
+
+# Standardize and find nearest neighbors
+nbrs = NearestNeighbors(n_neighbors=1).fit(real_data_scaled)
+distances, _ = nbrs.kneighbors(synthetic_data_scaled)
+
+p50 = np.percentile(distances, 50)
+p95 = np.percentile(distances, 95)
+print(f"Distance p50: {p50:.4f}, p95: {p95:.4f}")`,
+                    example: {
+                        interpretation: "p50=1.2, p95=2.8 indicates most synthetic records are reasonably distant from real"
+                    }
+                },
+                {
+                    name: "MIA (Membership Inference Attack)",
+                    symbol: "Acc_{MIA}",
+                    category: "privacy",
+                    subcategory: "Attack-Based",
+                    formula: "Acc_{MIA} = \\frac{TP + TN}{TP + TN + FP + FN}",
+                    description: "Train a classifier to distinguish real from synthetic records. Lower accuracy means better privacy (harder to distinguish).",
+                    interpretation: "Accuracy close to 0.5 (random guessing) is ideal. Higher accuracy indicates privacy leakage.",
+                    range: "[0, 1]",
+                    bestValue: "~0.5 (cannot distinguish real from synthetic)",
+                    worstValue: "~1.0 (can perfectly identify real records)",
+                    code: `from sdeval.metrics.privacy import compute_membership_inference_metrics
+
+mia_results = compute_membership_inference_metrics(
+    real_df=real_data,
+    synthetic_df=synthetic_data,
+    sample_size=1000,
+    random_state=42
+)
+print(f"MIA Accuracy: {mia_results['privacy_mia_accuracy']:.3f}")
+print(f"MIA AUC: {mia_results['privacy_mia_auc']:.3f}")`,
+                    example: {
+                        interpretation: "MIA Accuracy=0.58 (close to 0.5) suggests good privacy protection"
+                    }
+                },
+                {
+                    name: "K-Anonymity",
+                    symbol: "k",
+                    category: "privacy",
+                    subcategory: "Formal Privacy",
+                    formula: "k = \\min_{g \\in G} |g|",
+                    description: "Minimum group size when grouping by quasi-identifiers. Each record is indistinguishable from at least k-1 others.",
+                    interpretation: "Higher k provides stronger privacy. Typical values: k=5 or k=10.",
+                    range: "[1, ∞)",
+                    bestValue: "Higher k (stronger privacy)",
+                    worstValue: "k=1 (no privacy protection)",
+                    code: `from sdeval.metrics.privacy import compute_k_anonymity_metrics
+
+k_anon = compute_k_anonymity_metrics(
+    synthetic_df=synthetic_data,
+    quasi_identifiers=['age', 'gender', 'zipcode'],
+    k=5
+)
+print(f"Min group size: {k_anon['privacy_k_anonymity_min_group']}")
+print(f"Violating groups: {k_anon['privacy_k_anonymity_violating_groups_ratio']:.2%}")`,
+                    example: {
+                        interpretation: "k=5 with 0% violating groups means every record is in a group of at least 5 similar records"
+                    }
+                },
+                {
+                    name: "Differential Privacy (ε, δ)",
+                    symbol: "\\varepsilon, \\delta",
+                    category: "privacy",
+                    subcategory: "Formal Privacy",
+                    formula: "\\Pr[M(D) \\in S] \\leq e^{\\varepsilon} \\Pr[M(D') \\in S] + \\delta",
+                    description: "Formal privacy guarantee. ε (epsilon) is privacy budget, δ (delta) is failure probability. Lower values provide stronger privacy.",
+                    interpretation: "ε < 1 is strong privacy, ε < 10 is acceptable. δ should be very small (< 1/n).",
+                    range: "ε ∈ [0, ∞), δ ∈ [0, 1]",
+                    bestValue: "ε → 0, δ → 0 (strongest privacy)",
+                    worstValue: "Large ε (weak privacy)",
+                    code: `# Differential privacy is typically enforced during training
+# Example with Opacus (PyTorch DP library)
+from opacus import PrivacyEngine
+
+privacy_engine = PrivacyEngine()
+model, optimizer, data_loader = privacy_engine.make_private(
+    module=model,
+    optimizer=optimizer,
+    data_loader=train_loader,
+    noise_multiplier=1.1,
+    max_grad_norm=1.0,
+)
+
+# After training, get privacy spent
+epsilon = privacy_engine.get_epsilon(delta=1e-5)
+print(f"Privacy spent: ε={epsilon:.2f} at δ=1e-5")`,
+                    example: {
+                        interpretation: "ε=3.0, δ=1e-5 provides reasonable privacy for most applications"
+                    }
+                }
+            ],
+            coverage: [
+                {
+                    name: "Feature Coverage",
+                    symbol: "C_{feat}",
+                    category: "coverage",
+                    subcategory: "Completeness",
+                    formula: "C_{feat} = \\frac{|\\{f : f \\text{ has valid synthetic data}\\}|}{|F_{total}|}",
+                    description: "Fraction of features that have valid (non-null, non-zero) synthetic data.",
+                    interpretation: "Higher coverage indicates synthetic data is more complete. Should be close to 1.0.",
+                    range: "[0, 1]",
+                    bestValue: "1.0 (all features have valid data)",
+                    worstValue: "0.0 (no features have valid data)",
+                    code: `# Calculate feature coverage
+total_features = len(real_data.columns)
+valid_features = sum(
+    synthetic_data[col].notna().any() and 
+    (synthetic_data[col] != 0).any()
+    for col in synthetic_data.columns
+)
+feature_coverage = valid_features / total_features
+print(f"Feature Coverage: {feature_coverage:.2%}")`,
+                    example: {
+                        interpretation: "Coverage=0.95 means 95% of features have valid synthetic values"
+                    }
+                },
+                {
+                    name: "Range Coverage",
+                    symbol: "C_{range}",
+                    category: "coverage",
+                    subcategory: "Completeness",
+                    formula: "C_{range} = \\frac{1}{n}\\sum_{i=1}^{n}\\frac{\\max(S_{syn}^i) - \\min(S_{syn}^i)}{\\max(S_{real}^i) - \\min(S_{real}^i)}",
+                    description: "Fraction of real data range covered by synthetic data for numerical features.",
+                    interpretation: "Values close to 1.0 indicate synthetic data spans the full range of real data.",
+                    range: "[0, ∞)",
+                    bestValue: "~1.0 (synthetic covers full real range)",
+                    worstValue: "0.0 (synthetic has no range) or >> 1.0 (synthetic exceeds real range)",
+                    code: `# Calculate range coverage for numerical columns
+range_coverages = []
+for col in numerical_columns:
+    real_range = real_data[col].max() - real_data[col].min()
+    syn_range = synthetic_data[col].max() - synthetic_data[col].min()
+    if real_range > 0:
+        range_coverages.append(syn_range / real_range)
+
+avg_range_coverage = np.mean(range_coverages)
+print(f"Range Coverage: {avg_range_coverage:.2%}")`,
+                    example: {
+                        interpretation: "Coverage=0.92 means synthetic data covers 92% of the real data's range"
+                    }
+                },
+                {
+                    name: "Category Coverage",
+                    symbol: "C_{cat}",
+                    category: "coverage",
+                    subcategory: "Completeness",
+                    formula: "C_{cat} = \\frac{1}{m}\\sum_{j=1}^{m}\\frac{|\\text{categories}_{syn}^j \\cap \\text{categories}_{real}^j|}{|\\text{categories}_{real}^j|}",
+                    description: "Fraction of real categorical values that appear in synthetic data. Similar to Beta Recall but averaged.",
+                    interpretation: "Higher values indicate synthetic data represents all real categories well.",
+                    range: "[0, 1]",
+                    bestValue: "1.0 (all real categories present in synthetic)",
+                    worstValue: "0.0 (no real categories in synthetic)",
+                    code: `# Calculate category coverage
+category_coverages = []
+for col in categorical_columns:
+    real_cats = set(real_data[col].unique())
+    syn_cats = set(synthetic_data[col].unique())
+    if len(real_cats) > 0:
+        coverage = len(real_cats & syn_cats) / len(real_cats)
+        category_coverages.append(coverage)
+
+avg_cat_coverage = np.mean(category_coverages)
+print(f"Category Coverage: {avg_cat_coverage:.2%}")`,
+                    example: {
+                        interpretation: "Coverage=0.88 means 88% of real categories are represented in synthetic data"
+                    }
+                }
+            ]
         };
 
-        // Render Cards
-        function renderDatasetCards(searchTerm = '') {
-            const container = document.getElementById('datasetGrid');
+        // Render metrics function
+        function renderMetrics(category = 'all', searchTerm = '') {
+            const container = document.getElementById('metricsContainer');
             container.innerHTML = '';
 
-            const filtered = datasets.filter(d => {
-                const matchesSearch = d.name.toLowerCase().includes(searchTerm) || d.task.toLowerCase().includes(searchTerm);
-                const matchesFilter = currentFilter === 'all' || d.tags.includes(currentFilter);
-                return matchesSearch && matchesFilter;
-            });
+            let allMetrics = [];
+            if (category === 'all') {
+                Object.values(metricsData).forEach(categoryMetrics => {
+                    allMetrics = allMetrics.concat(categoryMetrics);
+                });
+            } else {
+                allMetrics = metricsData[category] || [];
+            }
 
-            filtered.forEach(d => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col";
-                card.innerHTML = `
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="font-bold text-lg text-slate-800">${d.name}</h3>
-                        <span class="text-xs font-semibold px-2 py-1 rounded-full ${getTaskColor(d.task)} mt-1 inline-block">${d.task}</span>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-bold text-slate-700">${formatNumber(d.rows)}</div>
-                        <div class="text-xs text-slate-400">Rows</div>
-                    </div>
-                </div>
-                
-                <div class="space-y-3 flex-grow">
-                    <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <div>
-                            <div class="font-bold text-indigo-600">${d.cols}</div>
-                            <div class="text-[10px] text-slate-500 uppercase">Cols</div>
-                        </div>
-                        <div>
-                            <div class="font-bold text-blue-600">${d.numerical}</div>
-                            <div class="text-[10px] text-slate-500 uppercase">Num</div>
-                        </div>
-                        <div>
-                            <div class="font-bold text-pink-600">${d.categorical}</div>
-                            <div class="text-[10px] text-slate-500 uppercase">Cat</div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-sm border-t border-slate-100 pt-3">
-                        <div class="flex justify-between py-1">
-                            <span class="text-slate-500">Minority Class:</span>
-                            <span class="font-medium text-slate-700">${d.imbalance.includes('N/A') ? '-' : d.imbalance}</span>
-                        </div>
-                        <div class="flex justify-between py-1">
-                            <span class="text-slate-500">Target:</span>
-                            <span class="font-medium text-slate-700 truncate max-w-[120px]" title="${d.target}">${d.target}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+            // Filter by search term
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                allMetrics = allMetrics.filter(metric =>
+                    metric.name.toLowerCase().includes(term) ||
+                    metric.description.toLowerCase().includes(term) ||
+                    metric.subcategory.toLowerCase().includes(term)
+                );
+            }
+
+            if (allMetrics.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-12">No metrics found matching your search.</div>';
+                return;
+            }
+
+            allMetrics.forEach((metric, index) => {
+                const card = createMetricCard(metric, index);
                 container.appendChild(card);
             });
+
+            // Render LaTeX
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ]
+            });
         }
 
-        // Render Paper List
-        function renderPaperList() {
-            const list = document.getElementById('paperList');
-            papers.forEach((p, index) => {
-                const item = document.createElement('div');
-                item.className = "bg-white p-4 rounded-lg border border-slate-200 flex items-start gap-4";
-                item.innerHTML = `
-                <div class="bg-indigo-100 text-indigo-700 font-bold w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">${index + 1}</div>
-                <div>
-                    <h4 class="font-bold text-slate-800">${p.title}</h4>
-                    <p class="text-sm text-slate-600">${p.desc}</p>
+        // Create metric card
+        function createMetricCard(metric, index) {
+            const card = document.createElement('div');
+            card.className = 'metric-card bg-white rounded-xl shadow-md p-6 fade-in';
+            card.style.animationDelay = `${index * 0.05}s`;
+
+            const categoryColors = {
+                statistical: 'bg-emerald-100 text-emerald-800',
+                ml: 'bg-blue-100 text-blue-800',
+                privacy: 'bg-amber-100 text-amber-800',
+                coverage: 'bg-purple-100 text-purple-800'
+            };
+
+            card.innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h3 class="text-2xl font-bold text-gray-900">${metric.name}</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${categoryColors[metric.category]}">
+                                ${metric.subcategory}
+                            </span>
+                        </div>
+                        <p class="text-gray-600">${metric.description}</p>
+                    </div>
+                    <button onclick="toggleCard(this)" class="ml-4 text-gray-400 hover:text-gray-600 transition">
+                        <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="expandable-content">
+                    <!-- Formula -->
+                    <div class="formula-box p-4 rounded-lg mb-4">
+                        <div class="text-sm font-semibold text-gray-700 mb-2">Mathematical Formula:</div>
+                        <div class="text-center text-lg">$$${metric.formula}$$</div>
+                    </div>
+
+                    <!-- Interpretation -->
+                    <div class="mb-4">
+                        <div class="text-sm font-semibold text-gray-700 mb-2">📊 Interpretation:</div>
+                        <p class="text-gray-600">${metric.interpretation}</p>
+                    </div>
+
+                    <!-- Range -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <div class="text-xs text-gray-500 mb-1">Range</div>
+                            <div class="font-mono font-semibold">${metric.range}</div>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-lg">
+                            <div class="text-xs text-gray-500 mb-1">Best Value</div>
+                            <div class="font-semibold text-green-700">${metric.bestValue}</div>
+                        </div>
+                        <div class="bg-red-50 p-3 rounded-lg">
+                            <div class="text-xs text-gray-500 mb-1">Worst Value</div>
+                            <div class="font-semibold text-red-700">${metric.worstValue}</div>
+                        </div>
+                    </div>
+
+                    <!-- Code Example -->
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-sm font-semibold text-gray-700">💻 Code Example:</div>
+                            <button onclick="copyCode(this)" class="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded transition">
+                                Copy
+                            </button>
+                        </div>
+                        <pre class="code-block p-4 rounded-lg overflow-x-auto"><code>${escapeHtml(metric.code)}</code></pre>
+                    </div>
+
+                    <!-- Example -->
+                    ${metric.example ? `
+                    <div class="bg-indigo-50 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-indigo-900 mb-2">💡 Example:</div>
+                        <div class="text-sm text-indigo-800">
+                            ${metric.example.real ? `<div><strong>Real:</strong> ${JSON.stringify(metric.example.real)}</div>` : ''}
+                            ${metric.example.synthetic ? `<div><strong>Synthetic:</strong> ${JSON.stringify(metric.example.synthetic)}</div>` : ''}
+                            ${metric.example.result ? `<div class="mt-2"><strong>Result:</strong> ${metric.example.result}</div>` : ''}
+                            ${metric.example.interpretation ? `<div class="mt-2">${metric.example.interpretation}</div>` : ''}
+                            ${metric.example.calculation ? `<div class="mt-2">${metric.example.calculation}</div>` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
             `;
-                list.appendChild(item);
+
+            return card;
+        }
+
+        // Toggle card expansion
+        function toggleCard(button) {
+            const card = button.closest('.metric-card');
+            const svg = button.querySelector('svg');
+            card.classList.toggle('collapsed');
+            svg.classList.toggle('rotate-180');
+        }
+
+        // Copy code to clipboard
+        function copyCode(button) {
+            const code = button.parentElement.nextElementSibling.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => button.textContent = 'Copy', 2000);
             });
         }
 
-        // Charts
-        function initCharts() {
-            Chart.defaults.font.family = "'Inter', sans-serif";
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
-            // 1. Atlas Chart (Scatter)
-            const ctxAtlas = document.getElementById('atlasChart').getContext('2d');
-            charts.atlas = new Chart(ctxAtlas, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Datasets',
-                        data: datasets.map(d => ({ x: d.rows, y: d.cols, name: d.name, type: d.task })),
-                        backgroundColor: datasets.map(d => d.task.includes('Regression') ? 'rgba(16, 185, 129, 0.7)' : 'rgba(79, 70, 229, 0.7)'),
-                        borderColor: datasets.map(d => d.task.includes('Regression') ? 'rgba(16, 185, 129, 1)' : 'rgba(79, 70, 229, 1)'),
-                        pointRadius: datasets.map(d => Math.min(Math.max(d.cols * 0.5, 6), 15)), // Size by columns
-                        pointHoverRadius: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            type: 'logarithmic',
-                            title: { display: true, text: 'Number of Rows (Log Scale)' },
-                            grid: { color: '#f1f5f9' }
-                        },
-                        y: {
-                            title: { display: true, text: 'Number of Columns' },
-                            grid: { color: '#f1f5f9' }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => {
-                                    const d = ctx.raw;
-                                    return `${d.name}: ${formatNumber(d.x)} rows, ${d.y} cols`;
-                                }
-                            }
-                        },
-                        legend: { display: false }
-                    }
-                }
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.classList.add('bg-gray-100', 'hover:bg-gray-200');
+                });
+                btn.classList.add('active');
+                btn.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+
+                const category = btn.dataset.category;
+                const searchTerm = document.getElementById('metricSearch').value;
+                renderMetrics(category, searchTerm);
             });
+        });
 
-            // 2. Performance Chart (Bar)
-            const ctxPerf = document.getElementById('performanceChart').getContext('2d');
-            charts.perf = new Chart(ctxPerf, {
-                type: 'bar',
-                data: {
-                    labels: ['Real Data', 'TabDDPM', 'TabSyn', 'GReaT', 'CTGAN (Baseline)'],
-                    datasets: [{
-                        label: 'Accuracy (Adult)',
-                        data: [0.86, 0.852, 0.855, 0.848, 0.81],
-                        backgroundColor: [
-                            '#94a3b8', // Real (Grey)
-                            '#4f46e5', // TabDDPM (Indigo)
-                            '#10b981', // TabSyn (Green)
-                            '#f59e0b', // GReaT (Amber)
-                            '#cbd5e1'  // CTGAN (Light Grey)
-                        ],
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            min: 0.75,
-                            max: 0.9,
-                            grid: { color: '#f1f5f9' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
+        // Search functionality
+        document.getElementById('metricSearch').addEventListener('input', (e) => {
+            const activeTab = document.querySelector('.tab-btn.active');
+            const category = activeTab.dataset.category;
+            renderMetrics(category, e.target.value);
+        });
 
-        // Helpers
-        function formatNumber(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
-            return num;
-        }
-
-        function getTaskColor(task) {
-            if (task.includes('Regression')) return 'bg-emerald-100 text-emerald-800';
-            if (task.includes('Multiclass')) return 'bg-amber-100 text-amber-800';
-            return 'bg-indigo-100 text-indigo-800';
-        }
-
+        // Initial render
+        renderMetrics('all');
     </script>
-
-
-
 </body>
 
 </html>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthetic Data Research Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+
+        /* Math Styling */
+        .math-font {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+
+        /* Chart Container Utilities */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+
+
+
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
+
+
+    <!-- Sidebar Navigation -->
+    <aside
+        class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between hidden md:flex transition-all duration-300"
+        id="sidebar">
+        <div>
+            <div class="p-6 border-b border-slate-700">
+                <h1 class="text-xl font-bold text-white tracking-tight">SynData<span class="text-indigo-400">Hub</span>
+                </h1>
+                <p class="text-xs text-slate-500 mt-1">Research Companion</p>
+            </div>
+            <nav class="p-4 space-y-2">
+                <button onclick="switchView('dashboard')"
+                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3 active-nav bg-slate-800 text-white"
+                    data-target="dashboard">
+                    <span>📊</span> Dashboard Atlas
+                </button>
+                <button onclick="switchView('datasets')"
+                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3"
+                    data-target="datasets">
+                    <span>🗂️</span> Dataset Cheat Sheet
+                </button>
+                <button onclick="switchView('methods')"
+                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3"
+                    data-target="methods">
+                    <span>🤖</span> Methods & SOTA
+                </button>
+                <button onclick="switchView('metrics')"
+                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3"
+                    data-target="metrics">
+                    <span>📐</span> Metrics Glossary
+                </button>
+                <button onclick="switchView('papers')"
+                    class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3"
+                    data-target="papers">
+                    <span>📄</span> Source Papers
+                </button>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-slate-700 text-xs text-slate-500">
+            Generated from 10 Research Papers
+        </div>
+    </aside>
+
+    <!-- Mobile Nav Header -->
+    <div class="md:hidden fixed top-0 left-0 w-full bg-slate-900 z-50 p-4 flex justify-between items-center text-white">
+        <span class="font-bold">SynDataHub</span>
+        <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="p-2">☰</button>
+    </div>
+    <div id="mobile-menu"
+        class="hidden fixed top-14 left-0 w-full bg-slate-800 z-40 p-4 text-white space-y-2 md:hidden">
+        <button onclick="switchView('dashboard'); document.getElementById('mobile-menu').classList.add('hidden')"
+            class="block w-full text-left p-2">Dashboard</button>
+        <button onclick="switchView('datasets'); document.getElementById('mobile-menu').classList.add('hidden')"
+            class="block w-full text-left p-2">Datasets</button>
+        <button onclick="switchView('methods'); document.getElementById('mobile-menu').classList.add('hidden')"
+            class="block w-full text-left p-2">Methods</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto relative pt-16 md:pt-0">
+
+        <!-- View: Dashboard Atlas -->
+        <section id="dashboard" class="view-section p-6 md:p-10 space-y-8">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">Landscape Overview</h2>
+                <p class="text-slate-600 max-w-3xl mt-2">
+                    A visual map of the datasets used across the attached papers (TabDDPM, TabSyn, etc.). Use this to
+                    quickly contextualize a dataset's size and complexity during your discussion.
+                </p>
+            </header>
+
+            <!-- Top Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-sm text-slate-500 font-medium">Total Datasets Analyzed</div>
+                    <div class="text-3xl font-bold text-indigo-600 mt-2">14</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-sm text-slate-500 font-medium">Most Common Dataset</div>
+                    <div class="text-3xl font-bold text-emerald-600 mt-2">Adult (Census)</div>
+                    <div class="text-xs text-slate-400 mt-1">Used in 9/10 papers</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-sm text-slate-500 font-medium">Largest Dataset</div>
+                    <div class="text-3xl font-bold text-amber-600 mt-2">Covertype</div>
+                    <div class="text-xs text-slate-400 mt-1">581k Rows</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-sm text-slate-500 font-medium">Primary Evaluation</div>
+                    <div class="text-3xl font-bold text-blue-600 mt-2">TSTR (MLE)</div>
+                    <div class="text-xs text-slate-400 mt-1">Train on Synthetic, Test on Real</div>
+                </div>
+            </div>
+
+            <!-- Main Scatter Plot -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-lg font-semibold mb-4">Dataset Complexity Map (Rows vs. Columns)</h3>
+                <div class="w-full h-96 relative chart-container">
+                    <canvas id="atlasChart"></canvas>
+                </div>
+                <p class="text-xs text-slate-400 mt-4 text-center">
+                    *X-Axis is Log Scale. Hover for detailed stats.
+                </p>
+            </div>
+        </section>
+
+        <!-- View: Dataset Cheat Sheet -->
+        <section id="datasets" class="view-section hidden p-6 md:p-10 space-y-8">
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900">Dataset Repository</h2>
+                    <p class="text-slate-600 mt-2">Quick-reference cards with the exact numbers you need.</p>
+                </div>
+                <input type="text" id="datasetSearch" placeholder="Search datasets (e.g., 'Adult', 'Imbalanced')..."
+                    class="w-full md:w-64 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+            </header>
+
+            <div class="flex gap-2 flex-wrap text-sm" id="datasetFilters">
+                <button
+                    class="filter-btn px-3 py-1 bg-slate-200 rounded-full hover:bg-indigo-100 hover:text-indigo-800 transition-colors"
+                    data-filter="all">All</button>
+                <button
+                    class="filter-btn px-3 py-1 bg-slate-200 rounded-full hover:bg-indigo-100 hover:text-indigo-800 transition-colors"
+                    data-filter="imbalanced">High Imbalance</button>
+                <button
+                    class="filter-btn px-3 py-1 bg-slate-200 rounded-full hover:bg-indigo-100 hover:text-indigo-800 transition-colors"
+                    data-filter="numerical">Numerical Only</button>
+                <button
+                    class="filter-btn px-3 py-1 bg-slate-200 rounded-full hover:bg-indigo-100 hover:text-indigo-800 transition-colors"
+                    data-filter="mixed">Mixed Type</button>
+            </div>
+
+            <div id="datasetGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                <!-- Cards injected by JS -->
+            </div>
+        </section>
+
+        <!-- View: Methods -->
+        <section id="methods" class="view-section hidden p-6 md:p-10 space-y-8">
+            <header>
+                <h2 class="text-3xl font-bold text-slate-900">Methodologies & Performance</h2>
+                <p class="text-slate-600 mt-2">Comparison of key synthetic data generation techniques found in the
+                    literature.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Method Explainer -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-lg text-indigo-700 mb-2">TabDDPM (2022)</h3>
+                        <p class="text-sm text-slate-600 mb-3">
+                            <span class="font-semibold">Core:</span> Denoising Diffusion Probabilistic Model.
+                        </p>
+                        <ul class="text-sm space-y-2 list-disc pl-4 text-slate-600">
+                            <li><strong>Encoding:</strong> Gaussian Quantile for numerical, One-hot for categorical.
+                            </li>
+                            <li><strong>Process:</strong> Adds Gaussian noise to embeddings, learns to reverse it.</li>
+                            <li><strong>Pros:</strong> SOTA performance on many tasks, handles mixed types well.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-lg text-emerald-700 mb-2">TabSyn (2024)</h3>
+                        <p class="text-sm text-slate-600 mb-3">
+                            <span class="font-semibold">Core:</span> Latent Diffusion Model (VAE + Diffusion).
+                        </p>
+                        <ul class="text-sm space-y-2 list-disc pl-4 text-slate-600">
+                            <li><strong>Strategy:</strong> Compresses data into a latent space using a VAE first.</li>
+                            <li><strong>Benefit:</strong> Faster sampling than TabDDPM (diffusion happens in smaller
+                                latent space).</li>
+                            <li><strong>Key Result:</strong> Better structure preservation (shapes) than pure diffusion.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-lg text-amber-700 mb-2">GReaT (2022)</h3>
+                        <p class="text-sm text-slate-600 mb-3">
+                            <span class="font-semibold">Core:</span> LLM Fine-tuning (DistilGPT-2).
+                        </p>
+                        <ul class="text-sm space-y-2 list-disc pl-4 text-slate-600">
+                            <li><strong>Technique:</strong> Serializes tabular rows into text sentences ("Age is 30,
+                                Income is...").</li>
+                            <li><strong>Pros:</strong> Excellent semantic understanding, conditioning is natural
+                                language.</li>
+                            <li><strong>Cons:</strong> Slow training/sampling, context window limits.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-fit">
+                    <h3 class="text-lg font-semibold mb-4">Performance Comparison (Adult Dataset)</h3>
+                    <p class="text-xs text-slate-500 mb-4">Machine Learning Efficacy (F1-Score / Accuracy). Higher is
+                        better.</p>
+                    <div class="w-full h-80 relative chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-xs text-slate-500 bg-slate-50 p-3 rounded">
+                        <span class="font-bold">Note:</span> Real data baseline is usually ~0.85-0.86 for Adult. TabDDPM
+                        and TabSyn consistently reach >0.84, often outperforming GAN-based methods (CTGAN ~0.81).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: Metrics -->
+        <section id="metrics" class="view-section hidden p-6 md:p-10 space-y-8">
+            <header>
+                <h2 class="text-3xl font-bold text-slate-900">Evaluation Metrics</h2>
+                <p class="text-slate-600 mt-2">Common formulas used to validate synthetic data quality.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- MLE -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-blue-500 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg">Machine Learning Efficacy (MLE)</h3>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Utility</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mt-2">Also known as TSTR (Train on Synthetic, Test on Real).</p>
+                    <div class="bg-slate-50 p-4 mt-4 rounded font-mono text-center text-sm border border-slate-200">
+                        Score = Accuracy(M<sub>synth</sub> on D<sub>real</sub>)
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3">
+                        <span class="font-semibold">Interpretation:</span> If the score is close to "Train on Real, Test
+                        on Real", the synthetic data successfully captured the predictive signals.
+                    </p>
+                </div>
+
+                <!-- Wasserstein -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-purple-500 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg">Wasserstein Distance</h3>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Fidelity</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mt-2">Measures the distance between the distribution of real and
+                        synthetic columns.</p>
+                    <div class="bg-slate-50 p-4 mt-4 rounded font-mono text-center text-sm border border-slate-200">
+                        W(P, Q) = inf E[d(x, y)]
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3">
+                        <span class="font-semibold">Interpretation:</span> Lower is better. 0 means distributions are
+                        identical. Usually calculated column-wise and averaged.
+                    </p>
+                </div>
+
+                <!-- DCR -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-red-500 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg">Distance to Closest Record (DCR)</h3>
+                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Privacy</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mt-2">Ensures synthetic data is not just copying real data.</p>
+                    <div class="bg-slate-50 p-4 mt-4 rounded font-mono text-center text-sm border border-slate-200">
+                        DCR = min || x<sub>synth</sub> - x<sub>real</sub> ||
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3">
+                        <span class="font-semibold">Interpretation:</span> We want this distance to be non-zero (to
+                        avoid memorization) but not too large (to maintain realism).
+                    </p>
+                </div>
+
+                <!-- Statistical Difference -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-green-500 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg">Correlation Matrix Difference</h3>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Structure</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mt-2">Checks if pairwise relationships are preserved.</p>
+                    <div class="bg-slate-50 p-4 mt-4 rounded font-mono text-center text-sm border border-slate-200">
+                        || Corr(Real) - Corr(Synth) ||<sub>2</sub>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3">
+                        <span class="font-semibold">Interpretation:</span> Lower is better. Visualized often as a
+                        heatmap difference.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: Source Papers -->
+        <section id="papers" class="view-section hidden p-6 md:p-10 space-y-8">
+            <header>
+                <h2 class="text-3xl font-bold text-slate-900">Source Papers</h2>
+                <p class="text-slate-600 mt-2">Summary of the uploaded documents driving this repository.</p>
+            </header>
+            <div class="space-y-4" id="paperList">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- DATA REPOSITORY ---
+
+        // Comprehensive Dataset List derived from uploaded papers (TabDDPM, TabSyn, etc.)
+        const datasets = [
+            {
+                id: 'adult',
+                name: 'Adult (Census Income)',
+                rows: 48842,
+                cols: 14,
+                numerical: 6,
+                categorical: 8,
+                task: 'Binary Classification',
+                target: 'Income (>50K)',
+                imbalance: '24% Minority (>50K)',
+                tags: ['imbalanced', 'mixed', 'benchmark']
+            },
+            {
+                id: 'cal_housing',
+                name: 'California Housing',
+                rows: 20640,
+                cols: 8,
+                numerical: 8,
+                categorical: 0,
+                task: 'Regression',
+                target: 'Median House Value',
+                imbalance: 'N/A',
+                tags: ['numerical', 'regression']
+            },
+            {
+                id: 'higgs',
+                name: 'Higgs Boson',
+                rows: 98050,
+                cols: 28,
+                numerical: 28,
+                categorical: 0,
+                task: 'Binary Classification',
+                target: 'Signal/Background',
+                imbalance: '47% Minority (Balanced)',
+                tags: ['numerical', 'large', 'physics']
+            },
+            {
+                id: 'diabetes',
+                name: 'Diabetes (Pima)',
+                rows: 768,
+                cols: 8,
+                numerical: 8,
+                categorical: 0,
+                task: 'Binary Classification',
+                target: 'Outcome',
+                imbalance: '35% Minority',
+                tags: ['small', 'medical', 'numerical']
+            },
+            {
+                id: 'bank',
+                name: 'Bank Marketing',
+                rows: 45211,
+                cols: 17,
+                numerical: 7,
+                categorical: 10,
+                task: 'Binary Classification',
+                target: 'Deposit (Yes/No)',
+                imbalance: '11.7% Minority (Yes)',
+                tags: ['imbalanced', 'mixed']
+            },
+            {
+                id: 'covertype',
+                name: 'Forest Covertype',
+                rows: 581012,
+                cols: 54,
+                numerical: 10,
+                categorical: 44, // Usually encoded
+                task: 'Multiclass Classification',
+                target: 'Cover Type (7 classes)',
+                imbalance: 'High (Classes 1&2 dominate)',
+                tags: ['large', 'multiclass', 'mixed']
+            },
+            {
+                id: 'shoppers',
+                name: 'Online Shoppers',
+                rows: 12330,
+                cols: 18,
+                numerical: 10,
+                categorical: 8,
+                task: 'Binary Classification',
+                target: 'Revenue',
+                imbalance: '15.5% Minority',
+                tags: ['mixed', 'imbalanced']
+            },
+            {
+                id: 'credit',
+                name: 'Default Credit',
+                rows: 30000,
+                cols: 24,
+                numerical: 23,
+                categorical: 1, // Often treated as num
+                task: 'Binary Classification',
+                target: 'Default',
+                imbalance: '22% Minority',
+                tags: ['numerical', 'imbalanced', 'financial']
+            },
+            {
+                id: 'beijing',
+                name: 'Beijing PM2.5',
+                rows: 43824,
+                cols: 13,
+                numerical: 9,
+                categorical: 4,
+                task: 'Regression',
+                target: 'PM2.5 Concentration',
+                imbalance: 'N/A',
+                tags: ['regression', 'environmental']
+            },
+            {
+                id: 'compas',
+                name: 'COMPAS Recidivism',
+                rows: 6172,
+                cols: 13, // Varies by preprocessing
+                numerical: 7,
+                categorical: 6,
+                task: 'Binary Classification',
+                target: 'TwoYearRecid',
+                imbalance: 'Balanced',
+                tags: ['fairness', 'mixed', 'small']
+            }
+        ];
+
+        const papers = [
+            { title: "TabDDPM", desc: "Diffusion models for tabular data using Gaussian multinomial diffusion." },
+            { title: "TabSyn", desc: "Latent space diffusion (VAE + Diffusion) for faster sampling." },
+            { title: "GReaT", desc: "LLM-based generation treating tabular data as text sentences." },
+            { title: "CuTS", desc: "Customizable generation with logical constraints." },
+            { title: "TabDiff", desc: "Transformer-based mixed-type diffusion." },
+            { title: "Fair Tab Diffusion", desc: "Balanced synthesis to mitigate bias in sensitive attributes." },
+            { title: "RELDDPM", desc: "Controllable synthesis using relational constraints." }
+        ];
+
+        // --- APP LOGIC ---
+
+        // State
+        let currentFilter = 'all';
+        let charts = {};
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDatasetCards();
+            renderPaperList();
+            initCharts();
+            setupEventListeners();
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Search
+            document.getElementById('datasetSearch').addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                renderDatasetCards(term);
+            });
+
+            // Filters
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // UI Update
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('bg-indigo-600', 'text-white');
+                        b.classList.add('bg-slate-200');
+                    });
+                    e.target.classList.remove('bg-slate-200');
+                    e.target.classList.add('bg-indigo-600', 'text-white');
+
+                    currentFilter = e.target.dataset.filter;
+                    renderDatasetCards(document.getElementById('datasetSearch').value.toLowerCase());
+                });
+            });
+        }
+
+        // View Switching
+        window.switchView = (viewId) => {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+
+            // Nav Active State
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.target === viewId) {
+                    btn.classList.add('bg-slate-800', 'text-white');
+                } else {
+                    btn.classList.remove('bg-slate-800', 'text-white');
+                }
+            });
+        };
+
+        // Render Cards
+        function renderDatasetCards(searchTerm = '') {
+            const container = document.getElementById('datasetGrid');
+            container.innerHTML = '';
+
+            const filtered = datasets.filter(d => {
+                const matchesSearch = d.name.toLowerCase().includes(searchTerm) || d.task.toLowerCase().includes(searchTerm);
+                const matchesFilter = currentFilter === 'all' || d.tags.includes(currentFilter);
+                return matchesSearch && matchesFilter;
+            });
+
+            filtered.forEach(d => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col";
+                card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">${d.name}</h3>
+                        <span class="text-xs font-semibold px-2 py-1 rounded-full ${getTaskColor(d.task)} mt-1 inline-block">${d.task}</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-slate-700">${formatNumber(d.rows)}</div>
+                        <div class="text-xs text-slate-400">Rows</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 flex-grow">
+                    <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                        <div>
+                            <div class="font-bold text-indigo-600">${d.cols}</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Cols</div>
+                        </div>
+                        <div>
+                            <div class="font-bold text-blue-600">${d.numerical}</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Num</div>
+                        </div>
+                        <div>
+                            <div class="font-bold text-pink-600">${d.categorical}</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Cat</div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm border-t border-slate-100 pt-3">
+                        <div class="flex justify-between py-1">
+                            <span class="text-slate-500">Minority Class:</span>
+                            <span class="font-medium text-slate-700">${d.imbalance.includes('N/A') ? '-' : d.imbalance}</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="text-slate-500">Target:</span>
+                            <span class="font-medium text-slate-700 truncate max-w-[120px]" title="${d.target}">${d.target}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render Paper List
+        function renderPaperList() {
+            const list = document.getElementById('paperList');
+            papers.forEach((p, index) => {
+                const item = document.createElement('div');
+                item.className = "bg-white p-4 rounded-lg border border-slate-200 flex items-start gap-4";
+                item.innerHTML = `
+                <div class="bg-indigo-100 text-indigo-700 font-bold w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">${index + 1}</div>
+                <div>
+                    <h4 class="font-bold text-slate-800">${p.title}</h4>
+                    <p class="text-sm text-slate-600">${p.desc}</p>
+                </div>
+            `;
+                list.appendChild(item);
+            });
+        }
+
+        // Charts
+        function initCharts() {
+            Chart.defaults.font.family = "'Inter', sans-serif";
+
+            // 1. Atlas Chart (Scatter)
+            const ctxAtlas = document.getElementById('atlasChart').getContext('2d');
+            charts.atlas = new Chart(ctxAtlas, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Datasets',
+                        data: datasets.map(d => ({ x: d.rows, y: d.cols, name: d.name, type: d.task })),
+                        backgroundColor: datasets.map(d => d.task.includes('Regression') ? 'rgba(16, 185, 129, 0.7)' : 'rgba(79, 70, 229, 0.7)'),
+                        borderColor: datasets.map(d => d.task.includes('Regression') ? 'rgba(16, 185, 129, 1)' : 'rgba(79, 70, 229, 1)'),
+                        pointRadius: datasets.map(d => Math.min(Math.max(d.cols * 0.5, 6), 15)), // Size by columns
+                        pointHoverRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Number of Rows (Log Scale)' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Number of Columns' },
+                            grid: { color: '#f1f5f9' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const d = ctx.raw;
+                                    return `${d.name}: ${formatNumber(d.x)} rows, ${d.y} cols`;
+                                }
+                            }
+                        },
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // 2. Performance Chart (Bar)
+            const ctxPerf = document.getElementById('performanceChart').getContext('2d');
+            charts.perf = new Chart(ctxPerf, {
+                type: 'bar',
+                data: {
+                    labels: ['Real Data', 'TabDDPM', 'TabSyn', 'GReaT', 'CTGAN (Baseline)'],
+                    datasets: [{
+                        label: 'Accuracy (Adult)',
+                        data: [0.86, 0.852, 0.855, 0.848, 0.81],
+                        backgroundColor: [
+                            '#94a3b8', // Real (Grey)
+                            '#4f46e5', // TabDDPM (Indigo)
+                            '#10b981', // TabSyn (Green)
+                            '#f59e0b', // GReaT (Amber)
+                            '#cbd5e1'  // CTGAN (Light Grey)
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 0.75,
+                            max: 0.9,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Helpers
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+            return num;
+        }
+
+        function getTaskColor(task) {
+            if (task.includes('Regression')) return 'bg-emerald-100 text-emerald-800';
+            if (task.includes('Multiclass')) return 'bg-amber-100 text-amber-800';
+            return 'bg-indigo-100 text-indigo-800';
+        }
+
+    </script>
+
+
+
+</body>
+
+</html>

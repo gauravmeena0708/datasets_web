@@ -436,69 +436,323 @@ document.addEventListener('DOMContentLoaded', () => {
         const singleDiff = d.difficulty?.single_constraint;
         const doubleDiff = d.difficulty?.double_constraint;
 
+        // Get sample data for this dataset (now using real data!)
+        const sampleData = RealDataGenerator.generateDatasetSample(id);
+        if (!sampleData) {
+            console.error('No sample data available for dataset:', id);
+            return;
+        }
+
         const html = `
             <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">${d.name}</h2>
             <p style="color: var(--text-secondary); margin-bottom: 2rem;">${d.origin}</p>
             
-            <span class="detail-label">Description</span>
-            <div class="detail-value">${d.description}</div>
+            <div class="eda-tabs">
+                <button class="eda-tab active" data-tab="overview">Overview</button>
+                <button class="eda-tab" data-tab="numerical">Numerical Analysis</button>
+                <button class="eda-tab" data-tab="categorical">Categorical Analysis</button>
+                <button class="eda-tab" data-tab="correlations">Correlations</button>
+            </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
-                <div>
-                     <span class="detail-label">Task</span>
-                     <div class="detail-value">${d.stats.task}</div>
+            <!-- Overview Tab -->
+            <div class="eda-content active" data-content="overview">
+                <span class="detail-label">Description</span>
+                <div class="detail-value">${d.description}</div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+                    <div>
+                         <span class="detail-label">Task</span>
+                         <div class="detail-value">${d.stats.task}</div>
+                    </div>
+                     <div>
+                         <span class="detail-label">Imbalance</span>
+                         <div class="detail-value">${d.stats.imbalance}</div>
+                    </div>
                 </div>
-                 <div>
-                     <span class="detail-label">Imbalance</span>
-                     <div class="detail-value">${d.stats.imbalance}</div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                      <div>
+                         <span class="detail-label">Class Ratio</span>
+                         <div class="detail-value">${d.class_imbalance_ratio || 'N/A'}</div>
+                    </div>
+                    <div>
+                         <span class="detail-label">Sparsity</span>
+                         <div class="detail-value">${d.sparsity || 'N/A'}</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 2rem;">
+                     <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:10px; text-align:center;">
+                        <div style="font-size:1.5rem; font-weight:bold;">${d.stats.rows.toLocaleString()}</div>
+                        <div style="font-size:0.8rem; opacity:0.7;">Rows</div>
+                    </div>
+                     <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:10px; text-align:center;">
+                        <div style="font-size:1.5rem; font-weight:bold;">${d.stats.cols}</div>
+                        <div style="font-size:0.8rem; opacity:0.7;">Columns</div>
+                    </div>
+                      <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:10px; text-align:center;">
+                        <div style="font-size:1.5rem; font-weight:bold;">${d.columns_type ? d.columns_type.categorical : 'N/A'}</div>
+                        <div style="font-size:0.8rem; opacity:0.7;">Cat. Feats</div>
+                    </div>
+                </div>
+
+                ${singleDiff ? `
+                <span class="detail-label" style="margin-top: 2rem;">Generation Difficulty</span>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                    <div style="background: ${getDifficultyColor(singleDiff.level)}15; padding: 1rem; border-radius: 10px; border: 1px solid ${getDifficultyColor(singleDiff.level)}33;">
+                        <div style="font-weight: bold; color: ${getDifficultyColor(singleDiff.level)}; margin-bottom: 0.5rem;">Single Constraint: ${singleDiff.level}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${singleDiff.reason}</div>
+                    </div>
+                    <div style="background: ${getDifficultyColor(doubleDiff.level)}15; padding: 1rem; border-radius: 10px; border: 1px solid ${getDifficultyColor(doubleDiff.level)}33;">
+                        <div style="font-weight: bold; color: ${getDifficultyColor(doubleDiff.level)}; margin-bottom: 0.5rem;">Double Constraint: ${doubleDiff.level}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${doubleDiff.reason}</div>
+                    </div>
+                </div>
+                ` : ''}
+
+                <span class="detail-label">Used In Papers</span>
+                <div class="detail-list">
+                    ${d.usage.map(u => `<span class="tag">${u}</span>`).join('')}
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
-                  <div>
-                     <span class="detail-label">Class Ratio</span>
-                     <div class="detail-value">${d.class_imbalance_ratio || 'N/A'}</div>
+            <!-- Numerical Analysis Tab -->
+            <div class="eda-content" data-content="numerical">
+                <div class="column-selector">
+                    <label for="numerical-column-select">Select Numerical Column:</label>
+                    <select id="numerical-column-select">
+                        ${Object.keys(sampleData.numerical).map((key, i) =>
+            `<option value="${key}" ${i === 0 ? 'selected' : ''}>${sampleData.numerical[key].name}</option>`
+        ).join('')}
+                    </select>
                 </div>
-                <div>
-                     <span class="detail-label">Sparsity</span>
-                     <div class="detail-value">${d.sparsity || 'N/A'}</div>
+                <div id="numerical-stats-container"></div>
+                <div class="chart-container">
+                    <canvas id="histogram-chart"></canvas>
                 </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 2rem;">
-                 <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:10px; text-align:center;">
-                    <div style="font-size:1.5rem; font-weight:bold;">${d.stats.rows.toLocaleString()}</div>
-                    <div style="font-size:0.8rem; opacity:0.7;">Rows</div>
-                </div>
-                 <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:10px; text-align:center;">
-                    <div style="font-size:1.5rem; font-weight:bold;">${d.stats.cols}</div>
-                    <div style="font-size:0.8rem; opacity:0.7;">Columns</div>
-                </div>
-                  <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:10px; text-align:center;">
-                    <div style="font-size:1.5rem; font-weight:bold;">${d.columns_type ? d.columns_type.categorical : 'N/A'}</div>
-                    <div style="font-size:0.8rem; opacity:0.7;">Cat. Feats</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="chart-container">
+                        <canvas id="boxplot-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="quantile-chart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            ${singleDiff ? `
-            <span class="detail-label" style="margin-top: 2rem;">Generation Difficulty</span>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
-                <div style="background: ${getDifficultyColor(singleDiff.level)}15; padding: 1rem; border-radius: 10px; border: 1px solid ${getDifficultyColor(singleDiff.level)}33;">
-                    <div style="font-weight: bold; color: ${getDifficultyColor(singleDiff.level)}; margin-bottom: 0.5rem;">Single Constraint: ${singleDiff.level}</div>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary);">${singleDiff.reason}</div>
+            <!-- Categorical Analysis Tab -->
+            <div class="eda-content" data-content="categorical">
+                <div class="column-selector">
+                    <label for="categorical-column-select">Select Categorical Column:</label>
+                    <select id="categorical-column-select">
+                        ${Object.keys(sampleData.categorical).map((key, i) =>
+            `<option value="${key}" ${i === 0 ? 'selected' : ''}>${sampleData.categorical[key].name}</option>`
+        ).join('')}
+                    </select>
                 </div>
-                <div style="background: ${getDifficultyColor(doubleDiff.level)}15; padding: 1rem; border-radius: 10px; border: 1px solid ${getDifficultyColor(doubleDiff.level)}33;">
-                    <div style="font-weight: bold; color: ${getDifficultyColor(doubleDiff.level)}; margin-bottom: 0.5rem;">Double Constraint: ${doubleDiff.level}</div>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary);">${doubleDiff.reason}</div>
+                <div id="categorical-summary-container"></div>
+                <div class="chart-container">
+                    <canvas id="categorical-chart"></canvas>
                 </div>
             </div>
-            ` : ''}
 
-            <span class="detail-label">Used In Papers</span>
-            <div class="detail-list">
-                ${d.usage.map(u => `<span class="tag">${u}</span>`).join('')}
+            <!-- Correlations Tab -->
+            <div class="eda-content" data-content="correlations">
+                <h3 style="color: var(--accent-secondary); margin-bottom: 1rem;">Feature Correlations</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                    Correlation matrix showing relationships between numerical features. 
+                    Darker colors indicate stronger correlations (positive in purple, negative in red).
+                </p>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="correlation-chart"></canvas>
+                </div>
             </div>
         `;
+
         openModal(html);
+
+        // Add modal class for larger size
+        const modalContent = document.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.classList.add('eda-modal');
+        }
+
+        // Setup tab switching
+        document.querySelectorAll('.eda-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active from all tabs and contents
+                document.querySelectorAll('.eda-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.eda-content').forEach(c => c.classList.remove('active'));
+
+                // Add active to clicked tab and corresponding content
+                tab.classList.add('active');
+                const targetContent = tab.dataset.tab;
+                const content = document.querySelector(`[data-content="${targetContent}"]`);
+                if (content) {
+                    content.classList.add('active');
+
+                    // Initialize charts when tab is activated
+                    if (targetContent === 'numerical') {
+                        renderNumericalAnalysis(sampleData);
+                    } else if (targetContent === 'categorical') {
+                        renderCategoricalAnalysis(sampleData);
+                    } else if (targetContent === 'correlations') {
+                        renderCorrelations(sampleData);
+                    }
+                }
+            });
+        });
+
+        // Initialize numerical analysis by default
+        setTimeout(() => renderNumericalAnalysis(sampleData), 100);
+
+        // Setup column selectors
+        const numericalSelect = document.getElementById('numerical-column-select');
+        if (numericalSelect) {
+            numericalSelect.addEventListener('change', () => renderNumericalAnalysis(sampleData));
+        }
+
+        const categoricalSelect = document.getElementById('categorical-column-select');
+        if (categoricalSelect) {
+            categoricalSelect.addEventListener('change', () => renderCategoricalAnalysis(sampleData));
+        }
     };
+
+    // Store active charts to destroy before creating new ones
+    let activeCharts = {};
+
+    function renderNumericalAnalysis(sampleData) {
+        const select = document.getElementById('numerical-column-select');
+        if (!select) return;
+
+        const selectedColumn = select.value;
+        const columnData = sampleData.numerical[selectedColumn];
+        if (!columnData) return;
+
+        // Calculate and display statistics
+        const stats = EDA.getSummaryStats(columnData.data);
+        const statsContainer = document.getElementById('numerical-stats-container');
+        if (statsContainer) {
+            statsContainer.innerHTML = EDA.formatStats(stats);
+        }
+
+        // Destroy existing charts
+        ['histogram', 'boxplot', 'quantile'].forEach(type => {
+            if (activeCharts[type]) {
+                activeCharts[type].destroy();
+            }
+        });
+
+        // Create new charts
+        activeCharts.histogram = EDA.createHistogram('histogram-chart', columnData.data, {
+            label: columnData.name,
+            color: '#6c5ce7'
+        });
+
+        activeCharts.boxplot = EDA.createBoxPlot('boxplot-chart', columnData.data, {
+            label: columnData.name,
+            color: '#00cec9'
+        });
+
+        activeCharts.quantile = EDA.createQuantileDiagram('quantile-chart', columnData.data, {
+            label: columnData.name,
+            color: '#6c5ce7'
+        });
+    }
+
+    function renderCategoricalAnalysis(sampleData) {
+        const select = document.getElementById('categorical-column-select');
+        if (!select) return;
+
+        const selectedColumn = select.value;
+        const columnData = sampleData.categorical[selectedColumn];
+        if (!columnData) return;
+
+        // Calculate statistics
+        const total = columnData.frequencies.reduce((sum, f) => sum + f, 0);
+        const uniqueCount = columnData.categories.length;
+        const maxFreq = Math.max(...columnData.frequencies);
+        const maxCategory = columnData.categories[columnData.frequencies.indexOf(maxFreq)];
+
+        // Display summary
+        const summaryContainer = document.getElementById('categorical-summary-container');
+        if (summaryContainer) {
+            summaryContainer.innerHTML = `
+                <div class="categorical-summary">
+                    <h4>Summary Statistics</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div class="stat-card">
+                            <div class="stat-label">Unique Values</div>
+                            <div class="stat-value">${uniqueCount}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Most Frequent</div>
+                            <div class="stat-value" style="font-size: 1rem;">${maxCategory}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Mode Frequency</div>
+                            <div class="stat-value">${((maxFreq / total) * 100).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                    <h4>Value Distribution</h4>
+                    <table class="frequency-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                                <th>Support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${columnData.categories.map((cat, i) => {
+                const freq = columnData.frequencies[i];
+                const pct = ((freq / total) * 100).toFixed(1);
+                return `
+                                    <tr>
+                                        <td><strong>${cat}</strong></td>
+                                        <td>${freq}</td>
+                                        <td>${pct}%</td>
+                                        <td>
+                                            <div class="frequency-bar" style="width: ${pct}%;"></div>
+                                        </td>
+                                    </tr>
+                                `;
+            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Destroy existing chart
+        if (activeCharts.categorical) {
+            activeCharts.categorical.destroy();
+        }
+
+        // Create new chart
+        activeCharts.categorical = EDA.createCategoricalChart(
+            'categorical-chart',
+            columnData.categories,
+            columnData.frequencies,
+            {
+                label: columnData.name,
+                color: '#00cec9'
+            }
+        );
+    }
+
+    function renderCorrelations(sampleData) {
+        // Destroy existing chart
+        if (activeCharts.correlation) {
+            activeCharts.correlation.destroy();
+        }
+
+        // Create correlation heatmap
+        activeCharts.correlation = EDA.createCorrelationHeatmap(
+            'correlation-chart',
+            sampleData.correlations,
+            sampleData.correlationLabels
+        );
+    }
 });

@@ -60,8 +60,15 @@ body {
 }
 
 @keyframes float {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(30px, 50px); }
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(30px, 50px);
+    }
 }
 
 /* Header */
@@ -100,7 +107,8 @@ body {
     padding-bottom: 0.25rem;
 }
 
-.nav-btn.active, .nav-btn:hover {
+.nav-btn.active,
+.nav-btn:hover {
     color: var(--text-primary);
 }
 
@@ -125,8 +133,15 @@ main {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hero {
@@ -142,6 +157,7 @@ main {
 
 .gradient-text {
     background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -175,7 +191,7 @@ main {
     background: var(--card-hover);
     transform: translateY(-5px);
     border-color: var(--accent-primary);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .dataset-card h3 {
@@ -243,7 +259,8 @@ main {
     color: var(--text-secondary);
 }
 
-.results-table th, .results-table td {
+.results-table th,
+.results-table td {
     text-align: left;
     padding: 0.75rem;
     border-bottom: 1px solid var(--glass-border);
@@ -261,7 +278,7 @@ main {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
@@ -285,7 +302,7 @@ main {
     border-radius: 20px;
     border: 1px solid var(--glass-border);
     position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 .close-modal {
@@ -324,8 +341,200 @@ main {
 }
 
 .tag {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     padding: 0.25rem 0.75rem;
     border-radius: 50px;
     font-size: 0.8rem;
+}
+
+/* EDA Modal Enhancements */
+.modal-content.eda-modal {
+    max-width: 95%;
+    width: 1200px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.eda-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--glass-border);
+    padding-bottom: 0;
+}
+
+.eda-tab {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    position: relative;
+    bottom: -2px;
+}
+
+.eda-tab:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.eda-tab.active {
+    color: var(--accent-secondary);
+    border-bottom-color: var(--accent-secondary);
+}
+
+.eda-content {
+    display: none;
+}
+
+.eda-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.chart-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    height: 400px;
+}
+
+.chart-container canvas {
+    max-height: 100%;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-secondary);
+}
+
+.column-selector {
+    margin-bottom: 1.5rem;
+}
+
+.column-selector label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.column-selector select {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.column-selector select:focus {
+    outline: none;
+    border-color: var(--accent-secondary);
+}
+
+.column-selector select option {
+    background: #1a1d2d;
+    color: var(--text-primary);
+}
+
+.categorical-summary {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.categorical-summary h4 {
+    color: var(--accent-secondary);
+    margin-bottom: 1rem;
+}
+
+.frequency-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.frequency-table th,
+.frequency-table td {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.frequency-table th {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.frequency-table td {
+    color: var(--text-primary);
+}
+
+.frequency-bar {
+    height: 8px;
+    background: var(--accent-primary);
+    border-radius: 4px;
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .eda-tabs {
+        flex-wrap: wrap;
+    }
+
+    .eda-tab {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .chart-container {
+        height: 300px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .modal-content.eda-modal {
+        width: 95%;
+        padding: 1.5rem;
+    }
 }
